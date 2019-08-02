@@ -72,7 +72,7 @@ export class Whatsapp {
     description: string
   ) {
     return await this.page.evaluate(
-      ({ to, content }) => {
+      ({ thumb, url, title, description, to }) => {
         WAPI.sendSeen(to);
         WAPI.sendMessageWithThumb(thumb, url, title, description, to);
       },
