@@ -16,6 +16,13 @@ declare module WAPI {
   const getGroupParticipantIDs: (groupId: string) => Id[];
   const getContact: (contactId: string) => Contact;
   const sendContact: (to: string, contact: string | string[]) => any;
+  const sendMessageWithThumb: (
+    thumb: string,
+    url: string,
+    title: string,
+    description: string,
+    to: string
+  ) => boolean;
 }
 
 export class Whatsapp {
@@ -45,6 +52,31 @@ export class Whatsapp {
         WAPI.sendMessage(to, content);
       },
       { to, content }
+    );
+  }
+
+  /**
+   * Sends a text message to given chat with thumbnail
+   * @param to chat id: xxxxx@us.c
+   * @param thumb base64 thumbnail image
+   * @param url canonical url
+   * @param title title of the preview
+   * @param description description of the preview
+   *
+   */
+  public async sendTextWithPreview(
+    to: string,
+    thumb: string,
+    url: string,
+    title: string,
+    description: string
+  ) {
+    return await this.page.evaluate(
+      ({ to, content }) => {
+        WAPI.sendSeen(to);
+        WAPI.sendMessageWithThumb(thumb, url, title, description, to);
+      },
+      { thumb, url, title, description, to }
     );
   }
 
