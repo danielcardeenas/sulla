@@ -12,7 +12,7 @@
 ## Installation
 
 ```bash
-> npm i sulla
+> npm i 
 ```
 
 ## Usage
