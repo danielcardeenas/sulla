@@ -2,6 +2,10 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/4cef2f41fd607c4c7094/maintainability)](https://codeclimate.com/github/danielcardeenas/sulla/maintainability)
 [![Greenkeeper badge](https://badges.greenkeeper.io/danielcardeenas/sulla.svg)](https://greenkeeper.io/)
 
+# Note
+Currently fixing this package. Please take a look at smashah branched version:
+[sulla-hotfix](https://github.com/smashah/sulla)
+
 # sulla
 
 > Sulla is a javascript library which provides a high-level API control to Whatsapp so it can be configured to automatize resposes or any data that goes trough Whatsapp effortlessly. 
