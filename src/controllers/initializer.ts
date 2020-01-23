@@ -1,4 +1,4 @@
-import ora from 'ora';
+import * as ora from 'ora';
 import { Whatsapp } from '../api/whatsapp';
 import { isAuthenticated, isInsideChat, retrieveQR } from './auth';
 import { initWhatsapp, injectApi } from './browser';

@@ -1,10 +1,8 @@
-import ora from 'ora';
+import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 import * as qrcode from 'qrcode-terminal';
 import { from, merge } from 'rxjs';
 import { take } from 'rxjs/operators';
-
-const spinner = ora();
 
 /**
  * Validates if client is authenticated
@@ -44,16 +42,31 @@ export const isInsideChat = (waPage: puppeteer.Page) => {
   );
 };
 
-export async function retrieveQR(waPage: puppeteer.Page) {
-  spinner.start('Loading QR');
-  await waPage.waitForSelector("img[alt='Scan me!']", { timeout: 0 });
-  const qrImage = await waPage.evaluate(
-    `document.querySelector("img[alt='Scan me!']").parentElement.getAttribute("data-ref")`
-  );
-  spinner.succeed();
-  qrcode.generate(qrImage, {
+export async function retrieveQR(page: puppeteer.Page) {
+  const code = await decodeQR(page);
+  qrcode.generate(code, {
     small: true
   });
 
   return true;
+}
+
+async function decodeQR(page: puppeteer.Page): Promise<string> {
+  await page.waitForSelector('canvas', { timeout: 0 });
+  await page.addScriptTag({
+    path: require.resolve(path.join(__dirname, '../lib', 'jsQR.js'))
+  });
+  return await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    const context = canvas.getContext('2d');
+
+    // @ts-ignore
+    const code = jsQR(
+      context.getImageData(0, 0, canvas.width, canvas.height).data,
+      canvas.width,
+      canvas.height
+    );
+
+    return code.data;
+  });
 }

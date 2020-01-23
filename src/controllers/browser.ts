@@ -26,8 +26,8 @@ export async function injectApi(page: puppeteer.Page) {
 
 async function initBrowser() {
   const browser = await puppeteer.launch({
-    // headless: false,
-    headless: true,
+    headless: false,
+    // headless: true,
     devtools: false,
     userDataDir: path.join(process.cwd(), 'session'),
     args: [...puppeteerConfig.chroniumArgs]

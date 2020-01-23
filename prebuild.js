@@ -5,7 +5,7 @@
  * Used in development only.
  */
 
-import * as shell from 'shelljs';
+var shell = require('shelljs');
 
 shell.cp('-R', './src/lib', 'dist');
 // shell.cp('-R', './src/api', 'dist');
