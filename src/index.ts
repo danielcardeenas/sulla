@@ -9,6 +9,7 @@ create().then(client => start(client));
 
 async function start(client: Whatsapp) {
   client.onMessage(message => {
+    console.log(message);
     if (message.body === 'Hi') {
       client.sendText(message.from, '👋 Hello from sulla!');
     }
