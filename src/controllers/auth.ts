@@ -54,8 +54,9 @@ export async function retrieveQR(page: puppeteer.Page) {
 async function decodeQR(page: puppeteer.Page): Promise<string> {
   await page.waitForSelector('canvas', { timeout: 0 });
   await page.addScriptTag({
-    path: require.resolve(path.join(__dirname, '../lib', 'jsQR.js'))
+    path: require.resolve(path.join(__dirname, '../lib/jsQR', 'jsQR.js'))
   });
+  
   return await page.evaluate(() => {
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');

@@ -6,9 +6,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "tsc && node dist/index.js",
-    "build": "tsc && npm run build:middleware && npm run build:lib",
-    "build:lib": "node prebuild.js",
-    "build:middleware": "tsc --out src/lib/middleware.js src/middleware/middleware.ts",
+    "build": "npm run build:wapi && npm run build:middleware && npm run build:jsQR && tsc",
+    "build:wapi": "cd src/lib/wapi/ && webpack",
+    "build:middleware": "cd src/lib/middleware/ && webpack",
+    "build:jsQR": "cd src/lib/jsQR/ && gulp",
     "watch": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
     "clean": "rm -rf session && rm -rf dist",
     "test": "echo \"No tests yet\""
@@ -37,16 +38,20 @@
   },
   "homepage": "https://github.com/danielcardeenas/sulla#readme",
   "devDependencies": {
-    "@types/node": "^13.1.8",
+    "@types/node": "^13.5.0",
     "@types/puppeteer": "^2.0.0",
     "@types/shelljs": "^0.8.6",
     "concurrently": "^5.0.2",
-    "husky": "^4.2.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "gulp": "^4.0.2",
+    "husky": "^4.2.1",
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
-    "shelljs": "^0.8.3",
-    "typescript": "^3.7.5"
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   },
   "dependencies": {
     "ora": "^4.0.3",
