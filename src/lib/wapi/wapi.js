@@ -51,7 +51,19 @@ if (!window.Store) {
         }
       }
   
-      webpackJsonp([], { parasite: (x, y, z) => getStore(z) }, ["parasite"]);
+      if (typeof webpackJsonp === 'function') {
+        webpackJsonp([], {'parasite': (x, y, z) => getStore(z)}, ['parasite']);
+      } else {
+          webpackJsonp.push([
+              ['parasite'],
+              {
+                  parasite: function (o, e, t) {
+                      getStore(t);
+                  }
+              },
+              [['parasite']]
+          ]);
+      }
     })();
   }
   
