@@ -10,7 +10,7 @@ export async function initWhatsapp(
   const browser = await initBrowser(session, headless, devtools);
   const waPage = await getWhatsappPage(browser);
   await waPage.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36'
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.0 Safari/537.36'
   );
 
   await waPage.goto(puppeteerConfig.whatsappUrl);
