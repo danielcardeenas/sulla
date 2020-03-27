@@ -9,7 +9,6 @@ const puppeteerConfig = {
     '--no-default-browser-check',
     '--disable-site-isolation-trials',
     '--no-experiments',
-    '--incognito',
     '--ignore-gpu-blacklist',
     '--ignore-certificate-errors',
     '--ignore-certificate-errors-spki-list',
