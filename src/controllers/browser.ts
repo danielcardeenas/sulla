@@ -2,8 +2,12 @@ import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 import { puppeteerConfig } from '../config/puppeteer.config';
 
-export async function initWhatsapp(session: string, headless: boolean, devtools: boolean) {
-  const browser = await initBrowser(session);
+export async function initWhatsapp(
+  session: string,
+  headless: boolean,
+  devtools: boolean
+) {
+  const browser = await initBrowser(session, headless, devtools);
   const waPage = await getWhatsappPage(browser);
   await waPage.setUserAgent(
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36'
@@ -18,16 +22,22 @@ export async function injectApi(page: puppeteer.Page) {
     path: require.resolve(path.join(__dirname, '../lib/wapi', 'wapi.js'))
   });
   await page.addScriptTag({
-    path: require.resolve(path.join(__dirname, '../lib/middleware', 'middleware.js'))
+    path: require.resolve(
+      path.join(__dirname, '../lib/middleware', 'middleware.js')
+    )
   });
 
   return page;
 }
 
-async function initBrowser(session: string) {
+async function initBrowser(
+  session: string,
+  headless: boolean,
+  devtools: boolean
+) {
   const browser = await puppeteer.launch({
-    headless: true,
-    devtools: false,
+    headless: headless,
+    devtools: devtools,
     userDataDir: path.join(process.cwd(), session),
     args: [...puppeteerConfig.chroniumArgs]
   });
