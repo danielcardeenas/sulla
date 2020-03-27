@@ -11,6 +11,8 @@ declare module WAPI {
   const sendSeen: (to: string) => void;
   const getAllContacts: () => Contact[];
   const getAllChats: () => Chat[];
+  const getChat: (id: string) => Chat[];
+  const getNewMessageId: (id: string) => Id[];
   const getAllChatsWithNewMsg: () => Chat[];
   const getAllGroups: () => Chat[];
   const getGroupParticipantIDs: (groupId: string) => Id[];
@@ -41,6 +43,9 @@ export class Whatsapp {
   public async sendText(to: string, content: string) {
     return await this.page.evaluate(
       ({ to, content }) => {
+        if (!WAPI.getChat(to)) {
+          WAPI.getNewMessageId(to);
+        }
         WAPI.sendSeen(to);
         WAPI.sendMessage(to, content);
       },
