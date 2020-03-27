@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 import { puppeteerConfig } from '../config/puppeteer.config';
 
-export async function initWhatsapp(session: string) {
+export async function initWhatsapp(session: string, headless: boolean, devtools: boolean) {
   const browser = await initBrowser(session);
   const waPage = await getWhatsappPage(browser);
   await waPage.setUserAgent(
