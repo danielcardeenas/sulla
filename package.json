@@ -38,24 +38,23 @@
   },
   "homepage": "https://github.com/danielcardeenas/sulla#readme",
   "devDependencies": {
-    "@types/node": "^13.5.0",
-    "@types/puppeteer": "^2.0.0",
-    "@types/shelljs": "^0.8.6",
-    "concurrently": "^5.0.2",
+    "@types/node": "^13.9.8",
+    "@types/puppeteer": "^2.0.1",
+    "concurrently": "^5.1.0",
     "copy-webpack-plugin": "^5.1.1",
     "gulp": "^4.0.2",
-    "husky": "^4.2.1",
+    "husky": "^4.2.3",
     "nodemon": "^2.0.2",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.2",
     "pretty-quick": "^2.0.1",
-    "ts-loader": "^6.2.1",
-    "typescript": "^3.7.5",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {
     "ora": "^4.0.3",
-    "puppeteer": "^2.0.0",
+    "puppeteer": "^2.1.1",
     "qrcode-terminal": "^0.12.0",
     "rxjs": "^6.5.4"
   }
