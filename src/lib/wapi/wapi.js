@@ -1,4 +1,17 @@
-import { sendMessage, sendMessage2 } from "./functions";
+import {
+  sendMessage,
+  sendMessage2,
+  createGroup,
+  leaveGroup,
+  getAllContacts,
+  getMyContacts,
+  getContact,
+  getAllChats,
+  hasUndreadMessages,
+  getAllChatsWithNewMessages,
+  getAllChatIds,
+  getAllNewMessages
+} from "./functions";
 import {
   _serializeChatObj,
   _serializeContactObj,
@@ -27,119 +40,32 @@ window.WAPI._serializeMessageObj = _serializeMessageObj;
 window.WAPI._serializeNumberStatusObj = _serializeNumberStatusObj;
 window.WAPI._serializeProfilePicThumb = _serializeProfilePicThumb;
 
-window.WAPI.createGroup = function(name, contactsId) {
-  if (!Array.isArray(contactsId)) {
-    contactsId = [contactsId];
-  }
+// Functions
+window.WAPI.createGroup = createGroup;
+window.WAPI.leaveGroup = leaveGroup;
+window.WAPI.getAllContacts = getAllContacts;
+window.WAPI.getMyContacts = getMyContacts;
+window.WAPI.getContact = getContact;
+window.WAPI.getAllChats = getAllChats;
+window.WAPI.hasUndreadMessages = hasUndreadMessages;
+window.WAPI.getAllChatsWithNewMessages = getAllChatsWithNewMessages;
+window.WAPI.getAllChatIds = getAllChatIds;
+window.WAPI.getAllNewMessages = getAllNewMessages;
 
-  return window.Store.Wap.createGroup(name, contactsId);
-};
-
-window.WAPI.leaveGroup = function(groupId) {
-  groupId = typeof groupId == "string" ? groupId : groupId._serialized;
-  var group = WAPI.getChat(groupId);
-  return group.sendExit();
-};
-
-window.WAPI.getAllContacts = function(done) {
-  const contacts = window.Store.Contact.map(contact =>
-    WAPI._serializeContactObj(contact)
-  );
-
-  if (done !== undefined) done(contacts);
-  return contacts;
-};
-
-/**
- * Fetches all contact objects from store, filters them
- *
- * @param done Optional callback function for async execution
- * @returns {Array|*} List of contacts
- */
-window.WAPI.getMyContacts = function(done) {
-  const contacts = window.Store.Contact.filter(
-    contact => contact.isMyContact === true
-  ).map(contact => WAPI._serializeContactObj(contact));
-  if (done !== undefined) done(contacts);
-  return contacts;
-};
-
-/**
- * Fetches contact object from store by ID
- *
- * @param id ID of contact
- * @param done Optional callback function for async execution
- * @returns {T|*} Contact object
- */
-window.WAPI.getContact = function(id, done) {
-  const found = window.Store.Contact.get(id);
-
-  if (done !== undefined) done(window.WAPI._serializeContactObj(found));
-  return window.WAPI._serializeContactObj(found);
-};
-
-/**
- * Fetches all chat objects from store
- *
- * @param done Optional callback function for async execution
- * @returns {Array|*} List of chats
- */
-window.WAPI.getAllChats = function(done) {
-  const chats = window.Store.Chat.map(chat => WAPI._serializeChatObj(chat));
-
-  if (done !== undefined) done(chats);
-  return chats;
-};
-
-window.WAPI.haveNewMsg = function(chat) {
-  return chat.unreadCount > 0;
-};
-
-window.WAPI.getAllChatsWithNewMsg = function(done) {
-  const chats = window.Store.Chat.filter(window.WAPI.haveNewMsg).map(chat =>
-    WAPI._serializeChatObj(chat)
-  );
-
-  if (done !== undefined) done(chats);
-  return chats;
-};
-
-/**
- * Fetches all chat IDs from store
- *
- * @param done Optional callback function for async execution
- * @returns {Array|*} List of chat id's
- */
-window.WAPI.getAllChatIds = function(done) {
-  const chatIds = window.Store.Chat.map(chat => chat.id._serialized || chat.id);
-
-  if (done !== undefined) done(chatIds);
-  return chatIds;
-};
-
-window.WAPI.getAllNewMessages = async function() {
-  return JSON.stringify(
-    WAPI.getAllChatsWithNewMsg()
-      .map(c => WAPI.getChat(c.id._serialized))
-      .map(c => c.msgs._models.filter(x => x.isNewMsg)) || []
-  );
-};
-
-// ACK: -1
-window.WAPI.getAllUnreadMessages = async function() {
-  return JSON.stringify(
-    WAPI.getAllChatsWithNewMsg()
-      .map(c => WAPI.getChat(c.id._serialized))
-      .map(c => c.msgs._models.filter(x => x.ack == -1))
-      .flatMap(x => x) || []
-  );
-};
+// window.WAPI.getAllUnreadMessages = async function() {
+//   return JSON.stringify(
+//     WAPI.getAllChatsWithNewMessages()
+//       .map(c => WAPI.getChat(c.id._serialized))
+//       .map(c => c.msgs._models.filter(x => x.ack == -1))
+//       .flatMap(x => x) || []
+//   );
+// };`
 
 window.WAPI.getAllChatsWithMessages = async function(onlyNew, done) {
   const x = [];
   if (onlyNew) {
     x.push(
-      WAPI.getAllChatsWithNewMsg().map(c => WAPI.getChat(c.id._serialized))
+      WAPI.getAllChatsWithNewMessages().map(c => WAPI.getChat(c.id._serialized))
     );
   } else {
     x.push(WAPI.getAllChatIds().map(c => WAPI.getChat(c)));
@@ -190,40 +116,19 @@ window.WAPI.getChatByName = function(name, done) {
   return found;
 };
 
-// TODO: Remove
-window.WAPI.sendImageFromDatabasePicBot = function(picId, chatId, caption) {
-  var chatDatabase = window.WAPI.getChatByName("DATABASEPICBOT");
-  var msgWithImg = chatDatabase.msgs.find(msg => msg.caption == picId);
-
-  if (msgWithImg === undefined) {
-    return false;
-  }
-  var chatSend = WAPI.getChat(chatId);
-  if (chatSend === undefined) {
-    return false;
-  }
-  const oldCaption = msgWithImg.caption;
-
-  msgWithImg.id.id = window.WAPI.getNewId();
-  msgWithImg.id.remote = chatId;
-  msgWithImg.t = Math.ceil(new Date().getTime() / 1000);
-  msgWithImg.to = chatId;
-
-  if (caption !== undefined && caption !== "") {
-    msgWithImg.caption = caption;
-  } else {
-    msgWithImg.caption = "";
-  }
-
-  msgWithImg.collection.send(msgWithImg).then(function(e) {
-    msgWithImg.caption = oldCaption;
-  });
-
-  return true;
-};
-
 window.WAPI.getWAVersion = function() {
   return window.DEBUG.VERSION;
+};
+
+window.WAPI.sendMessageMentioned = async function(
+  chatId,
+  message,
+  mentioned,
+) {
+  var chat = WAPI.getChat(chatId);
+  const user = await Store.Contact.serialize().find(x => x.id.user === mentioned);
+  console.log(user);
+  chat.sendMessage(message, {linkPreview : null, mentionedJidList : [user.id], quotedMsg : null, quotedMsgAdminGroupJid : null});
 };
 
 window.WAPI.sendMessageWithThumb = function(
@@ -1176,7 +1081,6 @@ window.WAPI.waitNewMessages = function(rmCallbackAfterUse = true, done) {
  * @returns {boolean}
  */
 window.WAPI.onStateChanged = function(callback) {
-  // (x,y)=>console.log('statechanged',x,x.state)
   window.Store.State.default.on("change:state", callback);
   return true;
 };
@@ -1272,15 +1176,16 @@ window.WAPI.getBufferedNewMessages = function(done) {
 };
 /** End new messages observable functions **/
 
-window.WAPI.sendImage = function(imgBase64, chatid, filename, caption, done) {
-  //var idUser = new window.Store.UserConstructor(chatid);
-  var idUser = new window.Store.UserConstructor(chatid, {
+window.WAPI.sendImage = function(chatid, imgBase64, filename, caption, done) {
+  console.log(chatid, filename, caption);
+  const idUser = new window.Store.UserConstructor(chatid, {
     intentionallyUsePrivateConstructor: true
   });
-  // create new chat
+
+  // Create new chat
   return Store.Chat.find(idUser).then(chat => {
-    var mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
-    var mc = new Store.MediaCollection();
+    const mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
+    const mc = new Store.MediaCollection();
     mc.processFiles([mediaBlob], chat, 1).then(() => {
       var media = mc.models[0];
       media.sendToChat(chat, { caption: caption });
@@ -1489,24 +1394,28 @@ window.WAPI.simulateTyping = async function(chatId, on) {
  * @param {string} lng longitude
  * @param {string} loc Text to go with the location message
  */
-window.WAPI.sendLocation = async function(chatId, lat, lng, loc) {
+window.WAPI.sendLocation = async function(chatId, latitude, longitude, caption) {
   var chat = Store.Chat.get(chatId);
   var tempMsg = Object.create(chat.msgs.filter(msg => msg.__x_isSentByMe)[0]);
   var newId = window.WAPI.getNewMessageId(chatId);
   var extend = {
     ack: 0,
     id: newId,
-    local: !0,
+    local: true,
     self: "out",
     t: parseInt(new Date().getTime() / 1000),
     to: chatId,
-    isNewMsg: !0,
+    isNewMsg: true,
     type: "location",
-    lat,
-    lng,
-    loc
+    lat: latitude,
+    lng: longitude,
+    loc: caption
   };
+
   Object.assign(tempMsg, extend);
+
+  console.log(chat);
+  console.log(tempMsg);
   await Store.addAndSendMsgToChat(chat, tempMsg);
 };
 

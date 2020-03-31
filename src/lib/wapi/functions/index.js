@@ -1,2 +1,12 @@
 export { sendMessage } from './send-message';
 export { sendMessage2 } from './send-message2';
+export { createGroup } from './create-group';
+export { leaveGroup } from './leave-group';
+export { getAllContacts } from './get-all-contacts';
+export { getMyContacts } from './get-my-contacts';
+export { getContact } from './get-contact';
+export { getAllChats } from './get-all-chats';
+export { hasUndreadMessages } from './has-unread-messages';
+export { getAllChatsWithNewMessages } from './get-chats-with-new-messages';
+export { getAllChatIds } from './get-all-chats-ids';
+export { getAllNewMessages } from './get-all-new-messages';

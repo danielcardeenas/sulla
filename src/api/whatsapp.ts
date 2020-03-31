@@ -1,9 +1,10 @@
 import { Page } from 'puppeteer';
-import { ExposedFn } from './functions/exposed.enum';
+import { ExposedFn } from './helpers/exposed.enum';
 import { Chat } from './model/chat';
 import { Contact } from './model/contact';
-import { Message } from './model/message';
 import { Id } from './model/id';
+import { Message } from './model/message';
+import { sendImage } from './functions';
 
 declare module WAPI {
   const waitNewMessages: (rmCallback: boolean, callback: Function) => void;
@@ -11,11 +12,12 @@ declare module WAPI {
   const sendSeen: (to: string) => void;
   const getAllContacts: () => Contact[];
   const getAllChats: () => Chat[];
-  const getAllChatsWithNewMsg: () => Chat[];
+  const getAllChatsWithNewMessages: () => Chat[];
   const getAllGroups: () => Chat[];
   const getGroupParticipantIDs: (groupId: string) => Id[];
   const getContact: (contactId: string) => Contact;
   const sendContact: (to: string, contact: string | string[]) => any;
+  const sendMessageMentioned: (...args: any) => any;
 }
 
 export class Whatsapp {
@@ -74,7 +76,7 @@ export class Whatsapp {
    */
   public async getAllChats(withNewMessageOnly = false) {
     if (withNewMessageOnly) {
-      return await this.page.evaluate(() => WAPI.getAllChatsWithNewMsg());
+      return await this.page.evaluate(() => WAPI.getAllChatsWithNewMessages());
     } else {
       return await this.page.evaluate(() => WAPI.getAllChats());
     }
@@ -87,11 +89,11 @@ export class Whatsapp {
   public async getAllGroups(withNewMessagesOnly = false) {
     if (withNewMessagesOnly) {
       // prettier-ignore
-      const chats = await this.page.evaluate(() => WAPI.getAllChatsWithNewMsg());
-      return chats.filter(chat => chat.isGroup);
+      const chats = await this.page.evaluate(() => WAPI.getAllChatsWithNewMessages());
+      return chats.filter((chat) => chat.isGroup);
     } else {
       const chats = await this.page.evaluate(() => WAPI.getAllChats());
-      return chats.filter(chat => chat.isGroup);
+      return chats.filter((chat) => chat.isGroup);
     }
   }
 
@@ -101,7 +103,7 @@ export class Whatsapp {
    */
   public async getGroupMembersId(groupId: string) {
     return await this.page.evaluate(
-      groupId => WAPI.getGroupParticipantIDs(groupId),
+      (groupId) => WAPI.getGroupParticipantIDs(groupId),
       groupId
     );
   }
@@ -112,7 +114,7 @@ export class Whatsapp {
    */
   public async getGroupMembers(groupId: string) {
     const membersIds = await this.getGroupMembersId(groupId);
-    const actions = membersIds.map(memberId => {
+    const actions = membersIds.map((memberId) => {
       return this.getContact(memberId._serialized);
     });
     return await Promise.all(actions);
@@ -125,8 +127,54 @@ export class Whatsapp {
    */
   public async getContact(contactId: string) {
     return await this.page.evaluate(
-      contactId => WAPI.getContact(contactId),
+      (contactId) => WAPI.getContact(contactId),
       contactId
     );
   }
+
+  public async sendMentioned(to: string, message: string, mentioned: string) {
+    console.log(message, mentioned);
+    return await this.page.evaluate(
+      ({ to, message, mentioned }) => {
+        WAPI.sendMessageMentioned(to, message, mentioned);
+      },
+      { to, message, mentioned }
+    );
+  }
+
+  /**
+   * Sends a text message to given chat
+   * @param to chat id: xxxxx@us.c
+   * @param content text message
+   */
+  public sendImage = sendImage;
+
+  // /**
+  //  * TODO: Fix message not being delivered
+  //  * Sends location to given chat id
+  //  * @param to Chat id
+  //  * @param latitude Latitude
+  //  * @param longitude Longitude
+  //  * @param caption Text caption
+  //  */
+  // public async sendLocation(
+  //   to: string,
+  //   latitude: number,
+  //   longitude: number,
+  //   title?: string,
+  //   subtitle?: string
+  // ) {
+  //   // Create caption
+  //   let caption = title || '';
+  //   if (subtitle) {
+  //     caption = `${title}\n${subtitle}`;
+  //   }
+
+  //   return await this.page.evaluate(
+  //     ({ to, latitude, longitude, caption }) => {
+  //       WAPI.sendLocation(to, latitude, longitude, caption);
+  //     },
+  //     { to, latitude, longitude, caption }
+  //   );
+  // }
 }
