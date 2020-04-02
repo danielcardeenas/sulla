@@ -2,11 +2,10 @@
  * Serializes contact object
  * @param {Contact} obj
  */
-export const _serializeContactObj = obj => {
+export const _serializeContactObj = (obj) => {
   if (obj == undefined) {
     return null;
   }
-
   return Object.assign(window.WAPI._serializeRawObj(obj), {
     formattedName: obj.formattedName,
     isHighLevelVerified: obj.isHighLevelVerified,
@@ -20,6 +19,6 @@ export const _serializeContactObj = obj => {
       ? WAPI._serializeProfilePicThumb(obj.profilePicThumb)
       : {},
     statusMute: obj.statusMute,
-    msgs: null
+    msgs: null,
   });
 };

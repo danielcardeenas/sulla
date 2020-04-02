@@ -1,9 +1,10 @@
 /**
  * Leaves group
  * @param {string} groupId The group id
+ * @returns Promise
  */
-export function leaveGroup(groupId) {
-  groupId = typeof groupId == "string" ? groupId : groupId._serialized;
+export async function leaveGroup(groupId) {
+  groupId = typeof groupId == 'string' ? groupId : groupId._serialized;
   var group = WAPI.getChat(groupId);
-  return group.sendExit();
-};
+  return Store.GroupActions.sendExitGroup(group);
+}
