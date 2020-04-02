@@ -3,6 +3,7 @@ import * as puppeteer from 'puppeteer';
 import * as qrcode from 'qrcode-terminal';
 import { from, merge } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { events } from './events';
 
 /**
  * Validates if client is authenticated
@@ -56,7 +57,13 @@ async function decodeQR(page: puppeteer.Page): Promise<string> {
   await page.addScriptTag({
     path: require.resolve(path.join(__dirname, '../lib/jsQR', 'jsQR.js'))
   });
-  
+
+  var qrCode = await page.evaluate(
+    `document.querySelector("canvas[aria-label='Scan me!']").toDataURL()`
+  );
+
+  events.emit('qrCode', qrCode);
+
   return await page.evaluate(() => {
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');
