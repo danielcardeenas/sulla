@@ -1,14 +1,12 @@
 export function sendMessage(id, message, done) {
-  var chat = WAPI.getChat(id);
-  if (chat) {
+  let chat = WAPI.getChat(id);
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  if (chat !== undefined) {
     if (done !== undefined) {
-      chat.sendMessage(message).then(function() {
-        function sleep(ms) {
-          return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        var trials = 0;
-
+      chat.sendMessage(message).then(function () {
+        let trials = 0;
         function check() {
           for (let i = chat.msgs.models.length - 1; i >= 0; i--) {
             let msg = chat.msgs.models[i];
@@ -20,8 +18,7 @@ export function sendMessage(id, message, done) {
             return True;
           }
           trials += 1;
-          // console.log(trials);
-          
+          console.log(trials);
           if (trials > 30) {
             done(true);
             return;
@@ -32,8 +29,9 @@ export function sendMessage(id, message, done) {
       });
       return true;
     } else {
-      chat.sendMessage(message);
-      return true;
+      return chat
+        .sendMessage(message)
+        .then((_) => chat.lastReceivedKey._serialized);
     }
   } else {
     if (done !== undefined) done(false);

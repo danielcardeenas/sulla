@@ -13,7 +13,10 @@ export const storeObjects = [
         ? module.default
         : null,
   },
-  { id: 'MediaProcess', conditions: (module) => (module.BLOB ? module : null) },
+  {
+    id: 'MediaProcess',
+    conditions: (module) => (module.BLOB ? module : null),
+  },
   {
     id: 'ChatUtil',
     conditions: (module) => (module.sendClear ? module : null),
@@ -135,6 +138,11 @@ export const storeObjects = [
     id: 'Me',
     conditions: (module) =>
       module.PLATFORMS && module.Conn ? module.default : null,
+  },
+  {
+    id: 'CallUtils',
+    conditions: (module) =>
+      module.sendCallEnd && module.parseCall ? module : null,
   },
   {
     id: 'Identity',

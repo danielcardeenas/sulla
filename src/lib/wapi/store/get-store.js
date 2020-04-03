@@ -1,5 +1,8 @@
+import { storeObjects } from './store-objects';
+
 export function getStore(modules) {
   let foundCount = 0;
+  let neededObjects = storeObjects;
   for (let idx in modules) {
     if (typeof modules[idx] === 'object' && modules[idx] !== null) {
       let first = Object.values(modules[idx])[0];
@@ -9,7 +12,7 @@ export function getStore(modules) {
           if (!module) {
             continue;
           }
-          storeObjects.forEach((needObj) => {
+          neededObjects.forEach((needObj) => {
             if (!needObj.conditions || needObj.foundedModule) return;
             let neededModule = needObj.conditions(module);
             if (neededModule !== null) {
@@ -17,19 +20,19 @@ export function getStore(modules) {
               needObj.foundedModule = neededModule;
             }
           });
-          if (foundCount == storeObjects.length) {
+          if (foundCount == neededObjects.length) {
             break;
           }
         }
 
-        let neededStore = storeObjects.find(
+        let neededStore = neededObjects.find(
           (needObj) => needObj.id === 'Store'
         );
         window.Store = neededStore.foundedModule
           ? neededStore.foundedModule
           : {};
-        storeObjects.splice(storeObjects.indexOf(neededStore), 1);
-        storeObjects.forEach((needObj) => {
+        neededObjects.splice(neededObjects.indexOf(neededStore), 1);
+        neededObjects.forEach((needObj) => {
           if (needObj.foundedModule) {
             window.Store[needObj.id] = needObj.foundedModule;
           }

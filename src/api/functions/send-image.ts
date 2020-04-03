@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 
 declare module WAPI {
-  // New
   const sendImage: (
     to: string,
     imgBase64: string,

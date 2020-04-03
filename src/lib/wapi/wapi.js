@@ -1,7 +1,3 @@
-/**
- * This script contains WAPI functions that need to be run in the context of the webpage
- */
-
 import {
   asyncLoadAllEarlierMessages,
   createGroup,
@@ -30,8 +26,33 @@ import {
   sendChatstate,
   sendMessageWithThumb,
   isLoggedIn,
+  sendMessage,
+  sendMessage2,
+  revokeGroupInviteLink,
+  areAllMessagesLoaded,
+  loadEarlierMessagesTillDate,
+  getAllGroupMetadata,
+  getMe,
+  getHost,
+  isConnected,
+  getAllMessagesInChat,
+  loadAndGetAllMessagesInChat,
+  sendMessageWithTags,
+  sendSeen,
+  getUnreadMessages,
+  getCommonGroups,
+  getGroupParticipantIDs,
+  _getGroupParticipants,
+  getGroupAdmins,
+  getProfilePicFromServer,
+  downloadFileWithCredentials,
+  getGroupMetadata,
+  getBatteryLevel,
+  deleteConversation,
+  deleteMessages,
+  clearChat,
+  getNumberProfile,
 } from './functions';
-import * as jsSHA from './jssha';
 import {
   _serializeChatObj,
   _serializeContactObj,
@@ -40,6 +61,12 @@ import {
   _serializeProfilePicThumb,
   _serializeRawObj,
 } from './serializers';
+
+import {
+  initNewMessagesListener,
+  addNewMessagesListener,
+  allNewMessagesListener,
+} from './listeners';
 import { getStore } from './store/get-store';
 
 if (!window.Store || !window.Store.Msg) {
@@ -88,37 +115,6 @@ window.WAPI.getChat = getChat;
 window.WAPI.getStatus = getStatus;
 window.WAPI.getChatByName = getChatByName;
 
-window.WAPI.sendImageFromDatabasePicBot = function (picId, chatId, caption) {
-  var chatDatabase = window.WAPI.getChatByName('DATABASEPICBOT');
-  var msgWithImg = chatDatabase.msgs.find((msg) => msg.caption == picId);
-
-  if (msgWithImg === undefined) {
-    return false;
-  }
-  var chatSend = WAPI.getChat(chatId);
-  if (chatSend === undefined) {
-    return false;
-  }
-  const oldCaption = msgWithImg.caption;
-
-  msgWithImg.id.id = getNewId();
-  msgWithImg.id.remote = chatId;
-  msgWithImg.t = Math.ceil(new Date().getTime() / 1000);
-  msgWithImg.to = chatId;
-
-  if (caption !== undefined && caption !== '') {
-    msgWithImg.caption = caption;
-  } else {
-    msgWithImg.caption = '';
-  }
-
-  msgWithImg.collection.send(msgWithImg).then(function (e) {
-    msgWithImg.caption = oldCaption;
-  });
-
-  return true;
-};
-
 window.WAPI.getGeneratedUserAgent = function (useragent) {
   if (!useragent.includes('WhatsApp')) return 'WhatsApp/0.4.315 ' + useragent;
   return useragent.replace(
@@ -135,202 +131,44 @@ window.WAPI.getWAVersion = function () {
 };
 
 window.WAPI.sendMessageWithThumb = sendMessageWithThumb;
+window.WAPI.revokeGroupInviteLink = revokeGroupInviteLink;
 window.WAPI.getGroupInviteLink = getGroupInviteLink;
 window.WAPI.getNewId = getNewId;
 window.WAPI.getChatById = getChatById;
 window.WAPI.getUnreadMessagesInChat = getUnreadMessagesInChat;
-window.WAPI.loadChatEarlierMessages = loadChatEarlierMessages;
+window.WAPI.loadEarlierMessages = loadChatEarlierMessages;
 window.WAPI.loadAllEarlierMessages = loadAllEarlierMessages;
 window.WAPI.asyncLoadAllEarlierMessages = asyncLoadAllEarlierMessages;
+window.WAPI.areAllMessagesLoaded = areAllMessagesLoaded;
+window.WAPI.loadEarlierMessagesTillDate = loadEarlierMessagesTillDate;
+window.WAPI.getAllGroupMetadata = getAllGroupMetadata;
+window.WAPI.getGroupMetadata = getGroupMetadata;
 
-window.WAPI.areAllMessagesLoaded = function (id, done) {
-  const found = WAPI.getChat(id);
-  if (!found.msgs.msgLoadState.noEarlierMsgs) {
-    if (done) done(false);
-    return false;
-  }
-  if (done) done(true);
-  return true;
-};
+window.WAPI._getGroupParticipants = _getGroupParticipants;
+window.WAPI.getGroupParticipantIDs = getGroupParticipantIDs;
+window.WAPI.getGroupAdmins = getGroupAdmins;
 
-/**
- * Load more messages in chat object from store by ID till a particular date
- *
- * @param id ID of chat
- * @param lastMessage UTC timestamp of last message to be loaded
- * @param done Optional callback function for async execution
- * @returns None
- */
-
-window.WAPI.loadEarlierMessagesTillDate = function (id, lastMessage, done) {
-  const found = WAPI.getChat(id);
-  x = function () {
-    if (
-      found.msgs.models[0].t > lastMessage &&
-      !found.msgs.msgLoadState.noEarlierMsgs
-    ) {
-      found.loadEarlierMsgs().then(x);
-    } else {
-      done();
-    }
-  };
-  x();
-};
-
-/**
- * Fetches all group metadata objects from store
- *
- * @param done Optional callback function for async execution
- * @returns {Array|*} List of group metadata
- */
-window.WAPI.getAllGroupMetadata = function (done) {
-  const groupData = window.Store.GroupMetadata.map(
-    (groupData) => groupData.all
-  );
-
-  if (done !== undefined) done(groupData);
-  return groupData;
-};
-
-/**
- * Fetches group metadata object from store by ID
- *
- * @param id ID of group
- * @param done Optional callback function for async execution
- * @returns {T|*} Group metadata object
- */
-window.WAPI.getGroupMetadata = async function (id, done) {
-  let output = window.Store.GroupMetadata.find(id);
-  if (done !== undefined) done(output);
-  return output;
-};
-
-/**
- * Fetches group participants
- *
- * @param id ID of group
- * @returns {Promise.<*>} Yields group metadata
- * @private
- */
-window.WAPI._getGroupParticipants = async function (id) {
-  const metadata = await WAPI.getGroupMetadata(id);
-  return metadata.participants;
-};
-
-/**
- * Fetches IDs of group participants
- *
- * @param id ID of group
- * @param done Optional callback function for async execution
- * @returns {Promise.<Array|*>} Yields list of IDs
- */
-window.WAPI.getGroupParticipantIDs = async function (id, done) {
-  const output = (await WAPI._getGroupParticipants(id)).map(
-    (participant) => participant.id
-  );
-
-  if (done !== undefined) done(output);
-  return output;
-};
-
-window.WAPI.getGroupAdmins = async function (id, done) {
-  const output = (await WAPI._getGroupParticipants(id))
-    .filter((participant) => participant.isAdmin)
-    .map((admin) => admin.id);
-
-  if (done !== undefined) done(output);
-  return output;
-};
-
-/**
- * Returns an object with all of your host device details
- */
-window.WAPI.getMe = function () {
-  return Store.Me.attributes;
-};
-
-/**
- * Gets object representing the logged in user
- *
- * @returns {Array|*|$q.all}
- */
-window.WAPI.getMe = function (done) {
-  const rawMe = window.Store.Contact.get(window.Store.Conn.me);
-
-  if (done !== undefined) done(rawMe.all);
-  return rawMe.all;
-};
-
+window.WAPI.getHost = getHost;
+window.WAPI.getMe = getMe;
 window.WAPI.isLoggedIn = isLoggedIn;
-
-window.WAPI.isConnected = function (done) {
-  // Phone Disconnected icon appears when phone is disconnected from the tnternet
-  const isConnected =
-    document.querySelector('*[data-icon="alert-phone"]') !== null
-      ? false
-      : true;
-
-  if (done !== undefined) done(isConnected);
-  return isConnected;
-};
-
+window.WAPI.isConnected = isConnected;
 window.WAPI.processMessageObj = processMessageObj;
+window.WAPI.getAllMessagesInChat = getAllMessagesInChat;
+window.WAPI.loadAndGetAllMessagesInChat = loadAndGetAllMessagesInChat;
 
-window.WAPI.getAllMessagesInChat = function (
-  id,
-  includeMe,
-  includeNotifications,
-  done
-) {
-  const chat = WAPI.getChat(id);
-  let output = [];
-  const messages = chat.msgs._models;
-
-  for (const i in messages) {
-    if (i === 'remove') {
-      continue;
-    }
-    const messageObj = messages[i];
-
-    let message = WAPI.processMessageObj(
-      messageObj,
-      includeMe,
-      includeNotifications
-    );
-    if (message) output.push(message);
-  }
-  if (done !== undefined) done(output);
-  return output;
-};
-
-window.WAPI.loadAndGetAllMessagesInChat = function (
-  id,
-  includeMe,
-  includeNotifications,
-  done
-) {
-  return WAPI.loadAllEarlierMessages(id).then((_) => {
-    const chat = WAPI.getChat(id);
-    let output = [];
-    const messages = chat.msgs._models;
-
-    for (const i in messages) {
-      if (i === 'remove') {
-        continue;
-      }
-      const messageObj = messages[i];
-
-      let message = WAPI.processMessageObj(
-        messageObj,
-        includeMe,
-        includeNotifications
-      );
-      if (message) output.push(message);
-    }
-    if (done !== undefined) done(output);
-    return output;
-  });
-};
+window.WAPI.sendMessageWithTags = sendMessageWithTags;
+window.WAPI.sendMessage = sendMessage;
+window.WAPI.sendMessage2 = sendMessage2;
+window.WAPI.sendSeen = sendSeen;
+window.WAPI.getUnreadMessages = getUnreadMessages;
+window.WAPI.getCommonGroups = getCommonGroups;
+window.WAPI.getProfilePicFromServer = getProfilePicFromServer;
+window.WAPI.downloadFileWithCredentials = downloadFileWithCredentials;
+window.WAPI.getBatteryLevel = getBatteryLevel;
+window.WAPI.deleteConversation = deleteConversation;
+window.WAPI.deleteMessages = deleteMessages;
+window.WAPI.clearChat = clearChat;
+window.WAPI.getNumberProfile = getNumberProfile;
 
 window.WAPI.getAllMessageIdsInChat = function (
   id,
@@ -473,36 +311,6 @@ window.WAPI.sendMessageToID = function (id, message, done) {
   return false;
 };
 
-window.WAPI.sendMessageWithMentions = async function (ch, body) {
-  var chat = ch.id ? ch : Store.Chat.get(ch);
-  var chatId = chat.id._serialized;
-  var msgIveSent = chat.msgs.filter((msg) => msg.__x_isSentByMe)[0];
-  if (!msgIveSent) return chat.sendMessage(body);
-  var tempMsg = Object.create(msgIveSent);
-  var newId = window.WAPI.getNewMessageId(chatId);
-  var mentionedJidList =
-    body
-      .match(/@(\d*)/g)
-      .map((x) => new Store.WidFactory.createUserWid(x.replace('@', ''))) ||
-    undefined;
-  var extend = {
-    ack: 0,
-    id: newId,
-    local: !0,
-    self: 'out',
-    t: parseInt(new Date().getTime() / 1000),
-    to: new Store.WidFactory.createWid(chatId),
-    isNewMsg: !0,
-    type: 'chat',
-    body,
-    quotedMsg: null,
-    mentionedJidList,
-  };
-  Object.assign(tempMsg, extend);
-  await Store.addAndSendMsgToChat(chat, tempMsg);
-  return newId._serialized;
-};
-
 window.WAPI.sendMessageReturnId = async function (ch, body) {
   var chat = ch.id ? ch : Store.Chat.get(ch);
   var chatId = chat.id._serialized;
@@ -527,221 +335,12 @@ window.WAPI.sendMessageReturnId = async function (ch, body) {
   return newId._serialized;
 };
 
-window.WAPI.sendMessage = function (id, message, done) {
-  var chat = WAPI.getChat(id);
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-  if (chat !== undefined) {
-    if (done !== undefined) {
-      chat.sendMessage(message).then(function () {
-        var trials = 0;
-
-        function check() {
-          for (let i = chat.msgs.models.length - 1; i >= 0; i--) {
-            let msg = chat.msgs.models[i];
-
-            if (!msg.senderObj.isMe || msg.body != message) {
-              continue;
-            }
-            done(WAPI._serializeMessageObj(msg));
-            return True;
-          }
-          trials += 1;
-          console.log(trials);
-          if (trials > 30) {
-            done(true);
-            return;
-          }
-          sleep(500).then(check);
-        }
-        check();
-      });
-      return true;
-    } else {
-      // return WAPI.sendMessageReturnId(chat,message).then(id=>{return id})
-      return chat
-        .sendMessage(message)
-        .then((_) => chat.lastReceivedKey._serialized);
-    }
-  } else {
-    if (done !== undefined) done(false);
-    return false;
-  }
-};
-
-window.WAPI.sendMessage2 = function (id, message, done) {
-  var chat = WAPI.getChat(id);
-  if (chat !== undefined) {
-    try {
-      if (done !== undefined) {
-        chat.sendMessage(message).then(function () {
-          done(true);
-        });
-      } else {
-        chat.sendMessage(message);
-      }
-      return true;
-    } catch (error) {
-      if (done !== undefined) done(false);
-      return false;
-    }
-  }
-  if (done !== undefined) done(false);
-  return false;
-};
-
-window.WAPI.sendSeen = function (id, done) {
-  var chat = window.WAPI.getChat(id);
-  if (chat !== undefined) {
-    if (done !== undefined) {
-      Store.SendSeen(chat, false).then(function () {
-        done(true);
-      });
-      return true;
-    } else {
-      Store.SendSeen(chat, false);
-      return true;
-    }
-  }
-  if (done !== undefined) done();
-  return false;
-};
-
-function isChatMessage(message) {
-  if (message.isSentByMe) {
-    return false;
-  }
-  if (message.isNotification) {
-    return false;
-  }
-  if (!message.isUserCreatedType) {
-    return false;
-  }
-  return true;
-}
-
-window.WAPI.getUnreadMessages = function (
-  includeMe,
-  includeNotifications,
-  use_unread_count,
-  done
-) {
-  const chats = window.Store.Chat.models;
-  let output = [];
-
-  for (let chat in chats) {
-    if (isNaN(chat)) {
-      continue;
-    }
-
-    let messageGroupObj = chats[chat];
-    let messageGroup = WAPI._serializeChatObj(messageGroupObj);
-
-    messageGroup.messages = [];
-
-    const messages = messageGroupObj.msgs._models;
-    for (let i = messages.length - 1; i >= 0; i--) {
-      let messageObj = messages[i];
-      if (
-        typeof messageObj.isNewMsg != 'boolean' ||
-        messageObj.isNewMsg === false
-      ) {
-        continue;
-      } else {
-        messageObj.isNewMsg = false;
-        let message = WAPI.processMessageObj(
-          messageObj,
-          includeMe,
-          includeNotifications
-        );
-        if (message) {
-          messageGroup.messages.push(message);
-        }
-      }
-    }
-
-    if (messageGroup.messages.length > 0) {
-      output.push(messageGroup);
-    } else {
-      // no messages with isNewMsg true
-      if (use_unread_count) {
-        let n = messageGroupObj.unreadCount; // will use unreadCount attribute to fetch last n messages from sender
-        for (let i = messages.length - 1; i >= 0; i--) {
-          let messageObj = messages[i];
-          if (n > 0) {
-            if (!messageObj.isSentByMe) {
-              let message = WAPI.processMessageObj(
-                messageObj,
-                includeMe,
-                includeNotifications
-              );
-              messageGroup.messages.unshift(message);
-              n -= 1;
-            }
-          } else if (n === -1) {
-            // chat was marked as unread so will fetch last message as unread
-            if (!messageObj.isSentByMe) {
-              let message = WAPI.processMessageObj(
-                messageObj,
-                includeMe,
-                includeNotifications
-              );
-              messageGroup.messages.unshift(message);
-              break;
-            }
-          } else {
-            // unreadCount = 0
-            break;
-          }
-        }
-        if (messageGroup.messages.length > 0) {
-          messageGroupObj.unreadCount = 0; // reset unread counter
-          output.push(messageGroup);
-        }
-      }
-    }
-  }
-  if (done !== undefined) {
-    done(output);
-  }
-  return output;
-};
-
 window.WAPI.getGroupOwnerID = async function (id, done) {
   const output = (await WAPI.getGroupMetadata(id)).owner.id;
   if (done !== undefined) {
     done(output);
   }
   return output;
-};
-
-window.WAPI.getCommonGroups = async function (id, done) {
-  let output = [];
-
-  groups = window.WAPI.getAllGroups();
-
-  for (let idx in groups) {
-    try {
-      participants = await window.WAPI.getGroupParticipantIDs(groups[idx].id);
-      if (participants.filter((participant) => participant == id).length) {
-        output.push(groups[idx]);
-      }
-    } catch (err) {
-      console.log('Error in group:');
-      console.log(groups[idx]);
-      console.log(err);
-    }
-  }
-
-  if (done !== undefined) {
-    done(output);
-  }
-  return output;
-};
-
-window.WAPI.getProfilePicFromServer = function (id) {
-  return Store.WapQuery.profilePicFind(id).then((x) => x.eurl);
 };
 
 window.WAPI.getProfilePicSmallFromId = function (id, done) {
@@ -774,35 +373,8 @@ window.WAPI.getProfilePicFromId = function (id, done) {
   );
 };
 
-window.WAPI.downloadFileWithCredentials = function (url, done) {
-  let xhr = new XMLHttpRequest();
-
-  xhr.onload = function () {
-    if (xhr.readyState == 4) {
-      if (xhr.status == 200) {
-        let reader = new FileReader();
-        reader.readAsDataURL(xhr.response);
-        reader.onload = function (e) {
-          done(reader.result.substr(reader.result.indexOf(',') + 1));
-        };
-      } else {
-        console.error(xhr.statusText);
-      }
-    } else {
-      console.log(err);
-      done(false);
-    }
-  };
-
-  xhr.open('GET', url, true);
-  xhr.withCredentials = true;
-  xhr.responseType = 'blob';
-  xhr.send(null);
-};
-
 window.WAPI.downloadFile = function (url, done) {
   let xhr = new XMLHttpRequest();
-
   xhr.onload = function () {
     if (xhr.readyState == 4) {
       if (xhr.status == 200) {
@@ -825,94 +397,7 @@ window.WAPI.downloadFile = function (url, done) {
   xhr.send(null);
 };
 
-window.WAPI.getBatteryLevel = function (done) {
-  if (window.Store.Conn.plugged) {
-    if (done !== undefined) {
-      done(100);
-    }
-    return 100;
-  }
-  output = window.Store.Conn.battery;
-  if (done !== undefined) {
-    done(output);
-  }
-  return output;
-};
-
-window.WAPI.deleteConversation = function (chatId, done) {
-  let userId = new window.Store.UserConstructor(chatId, {
-    intentionallyUsePrivateConstructor: true,
-  });
-  let conversation = WAPI.getChat(userId);
-
-  if (!conversation) {
-    if (done !== undefined) {
-      done(false);
-    }
-    return false;
-  }
-
-  window.Store.sendDelete(conversation, false)
-    .then(() => {
-      if (done !== undefined) {
-        done(true);
-      }
-    })
-    .catch(() => {
-      if (done !== undefined) {
-        done(false);
-      }
-    });
-
-  return true;
-};
-
-window.WAPI.smartDeleteMessages = function (
-  chatId,
-  messageArray,
-  onlyLocal,
-  done
-) {
-  var userId = new Store.WidFactory.createWid(chatId);
-  let conversation = WAPI.getChat(userId);
-  if (!conversation) {
-    if (done !== undefined) {
-      done(false);
-    }
-    return false;
-  }
-
-  if (!Array.isArray(messageArray)) {
-    messageArray = [messageArray];
-  }
-
-  let messagesToDelete = messageArray
-    .map((msgId) =>
-      typeof msgId == 'string' ? window.Store.Msg.get(msgId) : msgId
-    )
-    .filter((x) => x);
-  if (messagesToDelete.length == 0) return true;
-  let jobs = onlyLocal
-    ? [conversation.sendDeleteMsgs(messagesToDelete, conversation)]
-    : [
-        conversation.sendRevokeMsgs(
-          messagesToDelete.filter((msg) => msg.isSentByMe),
-          conversation
-        ),
-        conversation.sendDeleteMsgs(
-          messagesToDelete.filter((msg) => !msg.isSentByMe),
-          conversation
-        ),
-      ];
-  return Promise.all(jobs).then((_) => {
-    if (done !== undefined) {
-      done(true);
-    }
-    return true;
-  });
-};
-
-window.WAPI.deleteMessage = function (
+window.WAPI.deleteMessage2 = function (
   chatId,
   messageArray,
   revoke = false,
@@ -951,34 +436,6 @@ window.WAPI.deleteMessage = function (
   return true;
 };
 
-window.WAPI.clearChat = async function (id) {
-  return await Store.ChatUtil.sendClear(Store.Chat.get(id), true);
-};
-
-window.WAPI.checkNumberStatus = async function (id, done) {
-  try {
-    const result = await window.Store.WapQuery.queryExist(id);
-    if (result.jid === undefined) throw 404;
-    const data = window.WAPI._serializeNumberStatusObj(result);
-    if (data.status == 200) data.numberExists = true;
-    if (done !== undefined) {
-      done(window.WAPI._serializeNumberStatusObj(result));
-      done(data);
-    }
-    return data;
-  } catch (e) {
-    if (done !== undefined) {
-      done(
-        window.WAPI._serializeNumberStatusObj({
-          status: e,
-          jid: id,
-        })
-      );
-    }
-    return e;
-  }
-};
-
 /**
  * New messages observable functions.
  */
@@ -993,99 +450,14 @@ window.WAPI._newMessagesCallbacks = [];
 window.Store.Msg.off('add');
 sessionStorage.removeItem('saved_msgs');
 
-window.WAPI._newMessagesListener = window.Store.Msg.on('add', (newMessage) => {
-  if (newMessage && newMessage.isNewMsg && !newMessage.isSentByMe) {
-    let message = window.WAPI.processMessageObj(newMessage, false, false);
-    if (message) {
-      window.WAPI._newMessagesQueue.push(message);
-      window.WAPI._newMessagesBuffer.push(message);
-    }
-
-    // Starts debouncer time to don't call a callback for each message if more than one message arrives
-    // in the same second
-    if (
-      !window.WAPI._newMessagesDebouncer &&
-      window.WAPI._newMessagesQueue.length > 0
-    ) {
-      window.WAPI._newMessagesDebouncer = setTimeout(() => {
-        let queuedMessages = window.WAPI._newMessagesQueue;
-
-        window.WAPI._newMessagesDebouncer = null;
-        window.WAPI._newMessagesQueue = [];
-
-        let removeCallbacks = [];
-
-        window.WAPI._newMessagesCallbacks.forEach(function (callbackObj) {
-          if (callbackObj.callback !== undefined) {
-            callbackObj.callback(queuedMessages);
-          }
-          if (callbackObj.rmAfterUse === true) {
-            removeCallbacks.push(callbackObj);
-          }
-        });
-
-        // Remove removable callbacks.
-        removeCallbacks.forEach(function (rmCallbackObj) {
-          let callbackIndex = window.WAPI._newMessagesCallbacks.indexOf(
-            rmCallbackObj
-          );
-          window.WAPI._newMessagesCallbacks.splice(callbackIndex, 1);
-        });
-      }, 1000);
-    }
-  }
-});
-
-window.WAPI._unloadInform = (event) => {
-  // Save in the buffer the ungot unreaded messages
-  window.WAPI._newMessagesBuffer.forEach((message) => {
-    Object.keys(message).forEach((key) =>
-      message[key] === undefined ? delete message[key] : ''
-    );
-  });
-  sessionStorage.setItem(
-    'saved_msgs',
-    JSON.stringify(window.WAPI._newMessagesBuffer)
-  );
-
-  // Inform callbacks that the page will be reloaded.
-  window.WAPI._newMessagesCallbacks.forEach(function (callbackObj) {
-    if (callbackObj.callback !== undefined) {
-      callbackObj.callback({
-        status: -1,
-        message: 'page will be reloaded, wait and register callback again.',
-      });
-    }
-  });
-};
+initNewMessagesListener();
 
 window.addEventListener('unload', window.WAPI._unloadInform, false);
 window.addEventListener('beforeunload', window.WAPI._unloadInform, false);
 window.addEventListener('pageunload', window.WAPI._unloadInform, false);
 
-/**
- * Registers a callback to be called when a new message arrives the WAPI.
- * @param rmCallbackAfterUse - Boolean - Specify if the callback need to be executed only once
- * @param done - function - Callback function to be called when a new message arrives.
- * @returns {boolean}
- */
-window.WAPI.waitNewMessages = function (rmCallbackAfterUse = true, done) {
-  window.WAPI._newMessagesCallbacks.push({
-    callback: done,
-    rmAfterUse: rmCallbackAfterUse,
-  });
-  return true;
-};
-
-window.WAPI.addAllNewMessagesListener = (callback) =>
-  window.Store.Msg.on('add', (newMessage) => {
-    if (newMessage && newMessage.isNewMsg) {
-      let message = window.WAPI.processMessageObj(newMessage, true, false);
-      if (message) {
-        callback(message);
-      }
-    }
-  });
+addNewMessagesListener();
+allNewMessagesListener();
 
 /**
  * Registers a callback to be called when a the acknowledgement state of the phone connection.
@@ -1093,7 +465,6 @@ window.WAPI.addAllNewMessagesListener = (callback) =>
  * @returns {boolean}
  */
 window.WAPI.onStateChanged = function (callback) {
-  // (x,y)=>console.log('statechanged',x,x.state)
   window.Store.State.default.on('change:state', callback);
   return true;
 };
@@ -1458,7 +829,7 @@ window.WAPI.getNewMessageId = function (chatId) {
   // .clone();
 
   newMsgId.fromMe = true;
-  newMsgId.id = getNewId().toUpperCase();
+  newMsgId.id = WAPI.getNewId().toUpperCase();
   newMsgId.remote = chatId;
   newMsgId._serialized = `${newMsgId.fromMe}_${newMsgId.remote}_${newMsgId.id}`;
 
@@ -2147,6 +1518,20 @@ window.WAPI.sendImageAsSticker = async function (
   return await window.WAPI._sendSticker(encrypted, chatId, metadata);
 };
 
+window.WAPI.sendMessageMentioned = async function (chatId, message, mentioned) {
+  var chat = WAPI.getChat(chatId);
+  const user = await Store.Contact.serialize().find(
+    (x) => x.id.user === mentioned
+  );
+  console.log(user);
+  chat.sendMessage(message, {
+    linkPreview: null,
+    mentionedJidList: [user.id],
+    quotedMsg: null,
+    quotedMsgAdminGroupJid: null,
+  });
+};
+
 /**
 This will dump all possible stickers into the chat. ONLY FOR TESTING. THIS IS REALLY ANNOYING!!
 */
@@ -2169,3 +1554,685 @@ window.WAPI._STICKERDUMP = async function (chatId) {
 /**
  * This next line is jsSha
  */
+('use strict');
+(function (I) {
+  function w(c, a, d) {
+    var l = 0,
+      b = [],
+      g = 0,
+      f,
+      n,
+      k,
+      e,
+      h,
+      q,
+      y,
+      p,
+      m = !1,
+      t = [],
+      r = [],
+      u,
+      z = !1;
+    d = d || {};
+    f = d.encoding || 'UTF8';
+    u = d.numRounds || 1;
+    if (u !== parseInt(u, 10) || 1 > u)
+      throw Error('numRounds must a integer >= 1');
+    if (0 === c.lastIndexOf('SHA-', 0))
+      if (
+        ((q = function (b, a) {
+          return A(b, a, c);
+        }),
+        (y = function (b, a, l, f) {
+          var g, e;
+          if ('SHA-224' === c || 'SHA-256' === c)
+            (g = (((a + 65) >>> 9) << 4) + 15), (e = 16);
+          else throw Error('Unexpected error in SHA-2 implementation');
+          for (; b.length <= g; ) b.push(0);
+          b[a >>> 5] |= 128 << (24 - (a % 32));
+          a = a + l;
+          b[g] = a & 4294967295;
+          b[g - 1] = (a / 4294967296) | 0;
+          l = b.length;
+          for (a = 0; a < l; a += e) f = A(b.slice(a, a + e), f, c);
+          if ('SHA-224' === c) b = [f[0], f[1], f[2], f[3], f[4], f[5], f[6]];
+          else if ('SHA-256' === c) b = f;
+          else throw Error('Unexpected error in SHA-2 implementation');
+          return b;
+        }),
+        (p = function (b) {
+          return b.slice();
+        }),
+        'SHA-224' === c)
+      )
+        (h = 512), (e = 224);
+      else if ('SHA-256' === c) (h = 512), (e = 256);
+      else throw Error('Chosen SHA variant is not supported');
+    else throw Error('Chosen SHA variant is not supported');
+    k = B(a, f);
+    n = x(c);
+    this.setHMACKey = function (b, a, g) {
+      var e;
+      if (!0 === m) throw Error('HMAC key already set');
+      if (!0 === z) throw Error('Cannot set HMAC key after calling update');
+      f = (g || {}).encoding || 'UTF8';
+      a = B(a, f)(b);
+      b = a.binLen;
+      a = a.value;
+      e = h >>> 3;
+      g = e / 4 - 1;
+      if (e < b / 8) {
+        for (a = y(a, b, 0, x(c)); a.length <= g; ) a.push(0);
+        a[g] &= 4294967040;
+      } else if (e > b / 8) {
+        for (; a.length <= g; ) a.push(0);
+        a[g] &= 4294967040;
+      }
+      for (b = 0; b <= g; b += 1)
+        (t[b] = a[b] ^ 909522486), (r[b] = a[b] ^ 1549556828);
+      n = q(t, n);
+      l = h;
+      m = !0;
+    };
+    this.update = function (a) {
+      var c,
+        f,
+        e,
+        d = 0,
+        p = h >>> 5;
+      c = k(a, b, g);
+      a = c.binLen;
+      f = c.value;
+      c = a >>> 5;
+      for (e = 0; e < c; e += p)
+        d + h <= a && ((n = q(f.slice(e, e + p), n)), (d += h));
+      l += d;
+      b = f.slice(d >>> 5);
+      g = a % h;
+      z = !0;
+    };
+    this.getHash = function (a, f) {
+      var d, h, k, q;
+      if (!0 === m) throw Error('Cannot call getHash after setting HMAC key');
+      k = C(f);
+      switch (a) {
+        case 'HEX':
+          d = function (a) {
+            return D(a, e, k);
+          };
+          break;
+        case 'B64':
+          d = function (a) {
+            return E(a, e, k);
+          };
+          break;
+        case 'BYTES':
+          d = function (a) {
+            return F(a, e);
+          };
+          break;
+        case 'ARRAYBUFFER':
+          try {
+            h = new ArrayBuffer(0);
+          } catch (v) {
+            throw Error('ARRAYBUFFER not supported by this environment');
+          }
+          d = function (a) {
+            return G(a, e);
+          };
+          break;
+        default:
+          throw Error('format must be HEX, B64, BYTES, or ARRAYBUFFER');
+      }
+      q = y(b.slice(), g, l, p(n));
+      for (h = 1; h < u; h += 1) q = y(q, e, 0, x(c));
+      return d(q);
+    };
+    this.getHMAC = function (a, f) {
+      var d, k, t, u;
+      if (!1 === m)
+        throw Error('Cannot call getHMAC without first setting HMAC key');
+      t = C(f);
+      switch (a) {
+        case 'HEX':
+          d = function (a) {
+            return D(a, e, t);
+          };
+          break;
+        case 'B64':
+          d = function (a) {
+            return E(a, e, t);
+          };
+          break;
+        case 'BYTES':
+          d = function (a) {
+            return F(a, e);
+          };
+          break;
+        case 'ARRAYBUFFER':
+          try {
+            d = new ArrayBuffer(0);
+          } catch (v) {
+            throw Error('ARRAYBUFFER not supported by this environment');
+          }
+          d = function (a) {
+            return G(a, e);
+          };
+          break;
+        default:
+          throw Error('outputFormat must be HEX, B64, BYTES, or ARRAYBUFFER');
+      }
+      k = y(b.slice(), g, l, p(n));
+      u = q(r, x(c));
+      u = y(k, e, h, u);
+      return d(u);
+    };
+  }
+  function m() {}
+  function D(c, a, d) {
+    var l = '';
+    a /= 8;
+    var b, g;
+    for (b = 0; b < a; b += 1)
+      (g = c[b >>> 2] >>> (8 * (3 + (b % 4) * -1))),
+        (l +=
+          '0123456789abcdef'.charAt((g >>> 4) & 15) +
+          '0123456789abcdef'.charAt(g & 15));
+    return d.outputUpper ? l.toUpperCase() : l;
+  }
+  function E(c, a, d) {
+    var l = '',
+      b = a / 8,
+      g,
+      f,
+      n;
+    for (g = 0; g < b; g += 3)
+      for (
+        f = g + 1 < b ? c[(g + 1) >>> 2] : 0,
+          n = g + 2 < b ? c[(g + 2) >>> 2] : 0,
+          n =
+            (((c[g >>> 2] >>> (8 * (3 + (g % 4) * -1))) & 255) << 16) |
+            (((f >>> (8 * (3 + ((g + 1) % 4) * -1))) & 255) << 8) |
+            ((n >>> (8 * (3 + ((g + 2) % 4) * -1))) & 255),
+          f = 0;
+        4 > f;
+        f += 1
+      )
+        8 * g + 6 * f <= a
+          ? (l += 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.charAt(
+              (n >>> (6 * (3 - f))) & 63
+            ))
+          : (l += d.b64Pad);
+    return l;
+  }
+  function F(c, a) {
+    var d = '',
+      l = a / 8,
+      b,
+      g;
+    for (b = 0; b < l; b += 1)
+      (g = (c[b >>> 2] >>> (8 * (3 + (b % 4) * -1))) & 255),
+        (d += String.fromCharCode(g));
+    return d;
+  }
+  function G(c, a) {
+    var d = a / 8,
+      l,
+      b = new ArrayBuffer(d),
+      g;
+    g = new Uint8Array(b);
+    for (l = 0; l < d; l += 1)
+      g[l] = (c[l >>> 2] >>> (8 * (3 + (l % 4) * -1))) & 255;
+    return b;
+  }
+  function C(c) {
+    var a = { outputUpper: !1, b64Pad: '=', shakeLen: -1 };
+    c = c || {};
+    a.outputUpper = c.outputUpper || !1;
+    !0 === c.hasOwnProperty('b64Pad') && (a.b64Pad = c.b64Pad);
+    if ('boolean' !== typeof a.outputUpper)
+      throw Error('Invalid outputUpper formatting option');
+    if ('string' !== typeof a.b64Pad)
+      throw Error('Invalid b64Pad formatting option');
+    return a;
+  }
+  function B(c, a) {
+    var d;
+    switch (a) {
+      case 'UTF8':
+      case 'UTF16BE':
+      case 'UTF16LE':
+        break;
+      default:
+        throw Error('encoding must be UTF8, UTF16BE, or UTF16LE');
+    }
+    switch (c) {
+      case 'HEX':
+        d = function (a, b, c) {
+          var f = a.length,
+            d,
+            k,
+            e,
+            h,
+            q;
+          if (0 !== f % 2)
+            throw Error('String of HEX type must be in byte increments');
+          b = b || [0];
+          c = c || 0;
+          q = c >>> 3;
+          for (d = 0; d < f; d += 2) {
+            k = parseInt(a.substr(d, 2), 16);
+            if (isNaN(k))
+              throw Error('String of HEX type contains invalid characters');
+            h = (d >>> 1) + q;
+            for (e = h >>> 2; b.length <= e; ) b.push(0);
+            b[e] |= k << (8 * (3 + (h % 4) * -1));
+          }
+          return { value: b, binLen: 4 * f + c };
+        };
+        break;
+      case 'TEXT':
+        d = function (c, b, d) {
+          var f,
+            n,
+            k = 0,
+            e,
+            h,
+            q,
+            m,
+            p,
+            r;
+          b = b || [0];
+          d = d || 0;
+          q = d >>> 3;
+          if ('UTF8' === a)
+            for (r = 3, e = 0; e < c.length; e += 1)
+              for (
+                f = c.charCodeAt(e),
+                  n = [],
+                  128 > f
+                    ? n.push(f)
+                    : 2048 > f
+                    ? (n.push(192 | (f >>> 6)), n.push(128 | (f & 63)))
+                    : 55296 > f || 57344 <= f
+                    ? n.push(
+                        224 | (f >>> 12),
+                        128 | ((f >>> 6) & 63),
+                        128 | (f & 63)
+                      )
+                    : ((e += 1),
+                      (f =
+                        65536 +
+                        (((f & 1023) << 10) | (c.charCodeAt(e) & 1023))),
+                      n.push(
+                        240 | (f >>> 18),
+                        128 | ((f >>> 12) & 63),
+                        128 | ((f >>> 6) & 63),
+                        128 | (f & 63)
+                      )),
+                  h = 0;
+                h < n.length;
+                h += 1
+              ) {
+                p = k + q;
+                for (m = p >>> 2; b.length <= m; ) b.push(0);
+                b[m] |= n[h] << (8 * (r + (p % 4) * -1));
+                k += 1;
+              }
+          else if ('UTF16BE' === a || 'UTF16LE' === a)
+            for (
+              r = 2,
+                n = ('UTF16LE' === a && !0) || ('UTF16LE' !== a && !1),
+                e = 0;
+              e < c.length;
+              e += 1
+            ) {
+              f = c.charCodeAt(e);
+              !0 === n && ((h = f & 255), (f = (h << 8) | (f >>> 8)));
+              p = k + q;
+              for (m = p >>> 2; b.length <= m; ) b.push(0);
+              b[m] |= f << (8 * (r + (p % 4) * -1));
+              k += 2;
+            }
+          return { value: b, binLen: 8 * k + d };
+        };
+        break;
+      case 'B64':
+        d = function (a, b, c) {
+          var f = 0,
+            d,
+            k,
+            e,
+            h,
+            q,
+            m,
+            p;
+          if (-1 === a.search(/^[a-zA-Z0-9=+\/]+$/))
+            throw Error('Invalid character in base-64 string');
+          k = a.indexOf('=');
+          a = a.replace(/\=/g, '');
+          if (-1 !== k && k < a.length)
+            throw Error("Invalid '=' found in base-64 string");
+          b = b || [0];
+          c = c || 0;
+          m = c >>> 3;
+          for (k = 0; k < a.length; k += 4) {
+            q = a.substr(k, 4);
+            for (e = h = 0; e < q.length; e += 1)
+              (d = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.indexOf(
+                q[e]
+              )),
+                (h |= d << (18 - 6 * e));
+            for (e = 0; e < q.length - 1; e += 1) {
+              p = f + m;
+              for (d = p >>> 2; b.length <= d; ) b.push(0);
+              b[d] |= ((h >>> (16 - 8 * e)) & 255) << (8 * (3 + (p % 4) * -1));
+              f += 1;
+            }
+          }
+          return { value: b, binLen: 8 * f + c };
+        };
+        break;
+      case 'BYTES':
+        d = function (a, b, c) {
+          var d, n, k, e, h;
+          b = b || [0];
+          c = c || 0;
+          k = c >>> 3;
+          for (n = 0; n < a.length; n += 1)
+            (d = a.charCodeAt(n)),
+              (h = n + k),
+              (e = h >>> 2),
+              b.length <= e && b.push(0),
+              (b[e] |= d << (8 * (3 + (h % 4) * -1)));
+          return { value: b, binLen: 8 * a.length + c };
+        };
+        break;
+      case 'ARRAYBUFFER':
+        try {
+          d = new ArrayBuffer(0);
+        } catch (l) {
+          throw Error('ARRAYBUFFER not supported by this environment');
+        }
+        d = function (a, b, c) {
+          var d, n, k, e, h;
+          b = b || [0];
+          c = c || 0;
+          n = c >>> 3;
+          h = new Uint8Array(a);
+          for (d = 0; d < a.byteLength; d += 1)
+            (e = d + n),
+              (k = e >>> 2),
+              b.length <= k && b.push(0),
+              (b[k] |= h[d] << (8 * (3 + (e % 4) * -1)));
+          return { value: b, binLen: 8 * a.byteLength + c };
+        };
+        break;
+      default:
+        throw Error('format must be HEX, TEXT, B64, BYTES, or ARRAYBUFFER');
+    }
+    return d;
+  }
+  function r(c, a) {
+    return (c >>> a) | (c << (32 - a));
+  }
+  function J(c, a, d) {
+    return (c & a) ^ (~c & d);
+  }
+  function K(c, a, d) {
+    return (c & a) ^ (c & d) ^ (a & d);
+  }
+  function L(c) {
+    return r(c, 2) ^ r(c, 13) ^ r(c, 22);
+  }
+  function M(c) {
+    return r(c, 6) ^ r(c, 11) ^ r(c, 25);
+  }
+  function N(c) {
+    return r(c, 7) ^ r(c, 18) ^ (c >>> 3);
+  }
+  function O(c) {
+    return r(c, 17) ^ r(c, 19) ^ (c >>> 10);
+  }
+  function P(c, a) {
+    var d = (c & 65535) + (a & 65535);
+    return (
+      ((((c >>> 16) + (a >>> 16) + (d >>> 16)) & 65535) << 16) | (d & 65535)
+    );
+  }
+  function Q(c, a, d, l) {
+    var b = (c & 65535) + (a & 65535) + (d & 65535) + (l & 65535);
+    return (
+      ((((c >>> 16) + (a >>> 16) + (d >>> 16) + (l >>> 16) + (b >>> 16)) &
+        65535) <<
+        16) |
+      (b & 65535)
+    );
+  }
+  function R(c, a, d, l, b) {
+    var g = (c & 65535) + (a & 65535) + (d & 65535) + (l & 65535) + (b & 65535);
+    return (
+      ((((c >>> 16) +
+        (a >>> 16) +
+        (d >>> 16) +
+        (l >>> 16) +
+        (b >>> 16) +
+        (g >>> 16)) &
+        65535) <<
+        16) |
+      (g & 65535)
+    );
+  }
+  function x(c) {
+    var a = [],
+      d;
+    if (0 === c.lastIndexOf('SHA-', 0))
+      switch (
+        ((a = [
+          3238371032,
+          914150663,
+          812702999,
+          4144912697,
+          4290775857,
+          1750603025,
+          1694076839,
+          3204075428,
+        ]),
+        (d = [
+          1779033703,
+          3144134277,
+          1013904242,
+          2773480762,
+          1359893119,
+          2600822924,
+          528734635,
+          1541459225,
+        ]),
+        c)
+      ) {
+        case 'SHA-224':
+          break;
+        case 'SHA-256':
+          a = d;
+          break;
+        case 'SHA-384':
+          a = [
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+          ];
+          break;
+        case 'SHA-512':
+          a = [
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+            new m(),
+          ];
+          break;
+        default:
+          throw Error('Unknown SHA variant');
+      }
+    else throw Error('No SHA variants supported');
+    return a;
+  }
+  function A(c, a, d) {
+    var l,
+      b,
+      g,
+      f,
+      n,
+      k,
+      e,
+      h,
+      m,
+      r,
+      p,
+      w,
+      t,
+      x,
+      u,
+      z,
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      v = [],
+      G;
+    if ('SHA-224' === d || 'SHA-256' === d)
+      (r = 64),
+        (w = 1),
+        (F = Number),
+        (t = P),
+        (x = Q),
+        (u = R),
+        (z = N),
+        (A = O),
+        (B = L),
+        (C = M),
+        (E = K),
+        (D = J),
+        (G = H);
+    else throw Error('Unexpected error in SHA-2 implementation');
+    d = a[0];
+    l = a[1];
+    b = a[2];
+    g = a[3];
+    f = a[4];
+    n = a[5];
+    k = a[6];
+    e = a[7];
+    for (p = 0; p < r; p += 1)
+      16 > p
+        ? ((m = p * w),
+          (h = c.length <= m ? 0 : c[m]),
+          (m = c.length <= m + 1 ? 0 : c[m + 1]),
+          (v[p] = new F(h, m)))
+        : (v[p] = x(A(v[p - 2]), v[p - 7], z(v[p - 15]), v[p - 16])),
+        (h = u(e, C(f), D(f, n, k), G[p], v[p])),
+        (m = t(B(d), E(d, l, b))),
+        (e = k),
+        (k = n),
+        (n = f),
+        (f = t(g, h)),
+        (g = b),
+        (b = l),
+        (l = d),
+        (d = t(h, m));
+    a[0] = t(d, a[0]);
+    a[1] = t(l, a[1]);
+    a[2] = t(b, a[2]);
+    a[3] = t(g, a[3]);
+    a[4] = t(f, a[4]);
+    a[5] = t(n, a[5]);
+    a[6] = t(k, a[6]);
+    a[7] = t(e, a[7]);
+    return a;
+  }
+  var H;
+  H = [
+    1116352408,
+    1899447441,
+    3049323471,
+    3921009573,
+    961987163,
+    1508970993,
+    2453635748,
+    2870763221,
+    3624381080,
+    310598401,
+    607225278,
+    1426881987,
+    1925078388,
+    2162078206,
+    2614888103,
+    3248222580,
+    3835390401,
+    4022224774,
+    264347078,
+    604807628,
+    770255983,
+    1249150122,
+    1555081692,
+    1996064986,
+    2554220882,
+    2821834349,
+    2952996808,
+    3210313671,
+    3336571891,
+    3584528711,
+    113926993,
+    338241895,
+    666307205,
+    773529912,
+    1294757372,
+    1396182291,
+    1695183700,
+    1986661051,
+    2177026350,
+    2456956037,
+    2730485921,
+    2820302411,
+    3259730800,
+    3345764771,
+    3516065817,
+    3600352804,
+    4094571909,
+    275423344,
+    430227734,
+    506948616,
+    659060556,
+    883997877,
+    958139571,
+    1322822218,
+    1537002063,
+    1747873779,
+    1955562222,
+    2024104815,
+    2227730452,
+    2361852424,
+    2428436474,
+    2756734187,
+    3204031479,
+    3329325298,
+  ];
+  'function' === typeof define && define.amd
+    ? define(function () {
+        return w;
+      })
+    : 'undefined' !== typeof exports
+    ? ('undefined' !== typeof module && module.exports && (module.exports = w),
+      (exports = w))
+    : (I.jsSHA = w);
+})(this);

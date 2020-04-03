@@ -1,3 +1,10 @@
 export { Chat } from './chat';
+export { ChatState } from './chat-state';
 export { Contact } from './contact';
+export { GroupChangeEvent } from './group-change-event';
+export { GroupMetadata } from './group-metadata';
+export { GroupNotificationType } from './group-notification-type';
+export { Id } from './id';
 export { Message } from './message';
+export { ParticipantEvent } from './participant-event';
+export { PartialMessage } from './partial-message';

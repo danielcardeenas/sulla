@@ -1,4 +1,4 @@
-import { Id } from './id';
+import { Id } from '.';
 
 export interface GroupMetadata {
   id: Id;

@@ -2,12 +2,16 @@ export interface Message {
   id: string;
   body: string;
   type: string;
+  mimetype?: string;
+  lat?: string;
+  lng?: string;
+  loc?: string;
   t: number;
   notifyName: string;
   from: string;
   to: string;
-  author: string;
   self: string;
+  duration?: string | number;
   ack: number;
   invis: boolean;
   isNewMsg: boolean;
@@ -16,6 +20,7 @@ export interface Message {
   broadcast: boolean;
   isForwarded: boolean;
   labels: any[];
+  caption: string;
   sender: {
     id: string;
     name: string;
@@ -95,6 +100,7 @@ export interface Message {
     presence: { id: string; chatstates: any[] };
   };
   chatId: string;
+  quotedMsg: any;
   quotedMsgObj: any;
   mediaData: {};
 }
