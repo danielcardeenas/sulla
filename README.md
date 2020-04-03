@@ -45,9 +45,9 @@ function start(client) {
 | Get group members                 |             | ✅          |
 | Send contact                      |             | ✅          |
 | Get contact detail                |             | ✅          |
-| Send media (image, audio, doc)    |             |             |
-| Send stickers                     |             |             |
-| Decrypt media (image, audio, doc) |             |             |
+| Send media (image, audio, doc)    |             | ✅          |
+| Send stickers                     |             | ✅          |
+| Decrypt media (image, audio, doc) |             | ✅          |
 
 ## Contributing
 
