@@ -22,7 +22,7 @@ export async function sendImage(
   filename: string,
   caption?: string
 ) {
-  const data = fileToBase64(path);
+  const data = await fileToBase64(path);
   return await this.page.evaluate(
     ({ to, data, filename, caption }) => {
       WAPI.sendImage(data, to, filename, caption);

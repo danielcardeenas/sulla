@@ -6,6 +6,7 @@ import {
   deleteConversation,
   deleteMessages,
   downloadFileWithCredentials,
+  encryptAndUploadFile,
   getAllChatIds,
   getAllChats,
   getAllChatsWithMessages,
@@ -43,35 +44,36 @@ import {
   loadAndGetAllMessagesInChat,
   loadChatEarlierMessages,
   loadEarlierMessagesTillDate,
+  processFiles,
   processMessageObj,
   revokeGroupInviteLink,
   sendChatstate,
+  sendFile,
+  sendImage,
+  sendImageAsSticker,
+  sendImageWithProduct,
   sendLocation,
   sendMessage,
   sendMessage2,
   sendMessageWithTags,
   sendMessageWithThumb,
   sendSeen,
-  _getGroupParticipants,
-  processFiles,
-  sendImage,
+  sendSticker,
+  sendVideoAsGif,
   setMyName,
   setMyStatus,
-  sendVideoAsGif,
-  sendImageWithProduct,
-  sendImageAsSticker,
-  sendSticker,
-  encryptAndUploadFile,
+  _getGroupParticipants,
 } from './functions';
+import { base64ToFile, generateMediaKey, getFileHash } from './helper';
 import {
   addNewMessagesListener,
+  addOnAddedToGroup,
+  addOnLiveLocation,
+  addOnNewAcks,
+  addOnParticipantsChange,
+  addOnStateChange,
   allNewMessagesListener,
   initNewMessagesListener,
-  addOnStateChange,
-  addOnNewAcks,
-  addOnLiveLocation,
-  addOnParticipantsChange,
-  addOnAddedToGroup,
 } from './listeners';
 import {
   _serializeChatObj,
@@ -81,7 +83,6 @@ import {
   _serializeProfilePicThumb,
   _serializeRawObj,
 } from './serializers';
-import { base64ImageToFile, getFileHash, generateMediaKey } from './helper';
 import { getStore } from './store/get-store';
 
 if (!window.Store || !window.Store.Msg) {
@@ -495,6 +496,7 @@ window.WAPI.getBufferedNewMessages = function (done) {
 };
 
 window.WAPI.sendImage = sendImage;
+window.WAPI.sendFile = sendFile;
 window.WAPI.setMyName = setMyName;
 window.WAPI.setMyStatus = setMyStatus;
 window.WAPI.sendVideoAsGif = sendVideoAsGif;
@@ -521,7 +523,8 @@ window.WAPI.getBusinessProfilesProducts = function (id, done) {
 
 window.WAPI.processFiles = processFiles;
 window.WAPI.sendImageWithProduct = sendImageWithProduct;
-window.WAPI.base64ImageToFile = base64ImageToFile;
+window.WAPI.base64ImageToFile = base64ToFile;
+window.WAPI.base64ToFile = base64ToFile;
 
 /**
  * Send contact card to a specific chat using the chat ids

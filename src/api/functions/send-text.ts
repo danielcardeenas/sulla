@@ -8,7 +8,7 @@ declare module WAPI {
  * @param to chat id: xxxxx@us.c
  * @param content text message
  */
-export async function sendText(to: string, content: string) {
+export async function sendText(to: string, content: string): Promise<string> {
   return await this.page.evaluate(
     ({ to, content }) => {
       WAPI.sendSeen(to);

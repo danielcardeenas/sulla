@@ -4,7 +4,7 @@
  * @param {string} base64
  * @param {string} filename
  */
-export function base64ImageToFile(base64, filename) {
+export function base64ToFile(base64, filename) {
   var arr = base64.split(',');
   var mime = arr[0].match(/:(.*?);/)[1];
   var bstr = atob(arr[1]);

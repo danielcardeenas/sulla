@@ -4,3 +4,7 @@ export { setProfileStatus } from './set-profile-status';
 export { setProfileName } from './set-profile-name';
 export { setChatState } from './set-chat-state';
 export { getConnectionState } from './get-connection-state';
+export { sendTextWithTags } from './send-text-with-tags';
+export { sendMessageWithThumb } from './send-message-with-thumb';
+export { reply } from './reply';
+export { sendFile, sendFileFromPath } from './send-file';

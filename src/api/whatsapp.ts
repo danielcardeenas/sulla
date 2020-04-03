@@ -1,27 +1,31 @@
-import axios from 'axios';
 import { Page } from 'puppeteer';
 import * as sharp from 'sharp';
 import {
   getConnectionState,
+  reply,
+  sendFile,
   sendImage,
+  sendMessageWithThumb,
+  sendTextWithTags,
   setChatState,
   setProfileName,
   setProfileStatus,
+  sendFileFromPath,
 } from './functions';
 import { sendText } from './functions/send-text';
+import { base64MimeType } from './helpers';
 import { ExposedFn } from './helpers/exposed.enum';
 import {
   Ack,
   Chat,
-  ChatState,
   Contact,
   Id,
   PartialMessage,
   ParticipantEvent,
 } from './model';
+import { SocketState } from './model/enum/socket-state';
 import { LiveLocation } from './model/live-location';
 import { Message } from './model/message';
-import { SocketState } from './model/enum/socket-state';
 declare module WAPI {
   const waitNewMessages: (rmCallback: boolean, callback: Function) => void;
   const allNewMessagesListener: (callback: Function) => void;
@@ -29,13 +33,6 @@ declare module WAPI {
   const onAddedToGroup: (callback: Function) => any;
   const onParticipantsChanged: (groupId: string, callback: Function) => any;
   const onLiveLocation: (chatId: string, callback: Function) => any;
-  const sendMessage: (to: string, content: string) => string;
-  const sendMessageWithTags: (to: string, content: string) => string;
-  const reply: (
-    to: string,
-    content: string,
-    quotedMsg: string | Message
-  ) => void;
   const getGeneratedUserAgent: (userAgent?: string) => string;
   const forwardMessages: (
     to: string,
@@ -67,13 +64,6 @@ declare module WAPI {
     to: string,
     filename: string,
     caption: string
-  ) => void;
-  const sendMessageWithThumb: (
-    thumb: string,
-    url: string,
-    title: string,
-    description: string,
-    chatId: string
   ) => void;
   const getBusinessProfilesProducts: (to: string) => any;
   const sendImageWithProduct: (
@@ -149,32 +139,6 @@ declare global {
   }
 }
 
-export const getBase64 = async (url: string) => {
-  try {
-    const res = await axios.get(url, {
-      responseType: 'arraybuffer',
-    });
-    return `data:${res.headers['content-type']};base64,${Buffer.from(
-      res.data,
-      'binary'
-    ).toString('base64')}`;
-  } catch (error) {
-    console.log('TCL: getBase64 -> error', error);
-  }
-};
-
-function base64MimeType(encoded) {
-  var result = null;
-  if (typeof encoded !== 'string') {
-    return result;
-  }
-  var mime = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
-  if (mime && mime.length) {
-    result = mime[1];
-  }
-  return result;
-}
-
 export class Whatsapp {
   constructor(public page: Page) {
     this.page = page;
@@ -230,6 +194,76 @@ export class Whatsapp {
   }
 
   /**
+   * @event Listens to live locations from a chat that already has valid live locations
+   * @param chatId the chat from which you want to subscribes to live location updates
+   * @param fn callback that takes in a LiveLocation
+   * @returns boolean, if returns false then there were no valid live locations in the chat of chatId
+   * @emits <LiveLocation> LiveLocation
+   */
+  public async onLiveLocation(
+    chatId: string,
+    fn: (liveLocationChangedEvent: LiveLocation) => void
+  ) {
+    const method = 'onLiveLocation_' + chatId.replace('_', '').replace('_', '');
+    return this.page
+      .exposeFunction(method, (liveLocationChangedEvent: LiveLocation) =>
+        fn(liveLocationChangedEvent)
+      )
+      .then((_) =>
+        this.page.evaluate(
+          ({ chatId, method }) => {
+            //@ts-ignore
+            return WAPI.onLiveLocation(chatId, window[method]);
+          },
+          { chatId, method }
+        )
+      );
+  }
+
+  /**
+   * @param to group id: xxxxx-yyyy@us.c
+   * @param to callback
+   * @returns Stream of ParticipantEvent
+   */
+  public async onParticipantsChanged(
+    groupId: string,
+    fn: (participantChangedEvent: ParticipantEvent) => void
+  ) {
+    const method =
+      'onParticipantsChanged_' + groupId.replace('_', '').replace('_', '');
+    return this.page
+      .exposeFunction(method, (participantChangedEvent: ParticipantEvent) =>
+        fn(participantChangedEvent)
+      )
+      .then((_) =>
+        this.page.evaluate(
+          ({ groupId, method }) => {
+            //@ts-ignore
+            WAPI.onParticipantsChanged(groupId, window[method]);
+          },
+          { groupId, method }
+        )
+      );
+  }
+
+  /**
+   * @event Fires callback with Chat object every time the host phone is added to a group.
+   * @param to callback
+   * @returns Observable stream of Chats
+   */
+  public async onAddedToGroup(fn: (chat: Chat) => any) {
+    const method = 'onAddedToGroup';
+    return this.page
+      .exposeFunction(method, (chat: any) => fn(chat))
+      .then((_) =>
+        this.page.evaluate(() => {
+          //@ts-ignore
+          WAPI.onAddedToGroup(window.onAddedToGroup);
+        })
+      );
+  }
+
+  /**
    * Sets current user profile status
    * @param status
    */
@@ -243,8 +277,8 @@ export class Whatsapp {
 
   /**
    * Sets the chat state
-   * @param {ChatState} chatState Chat state to be set (TYPING (0), RECRDING (1) or PAUSED (2)).
-   * @param {String} chatId
+   * @param chatState Chat state to be set (TYPING (0), RECRDING (1) or PAUSED (2)).
+   * @param chatId
    */
   public setChatState = setChatState;
 
@@ -252,95 +286,6 @@ export class Whatsapp {
    * Retrieves the connecction state
    */
   public getConnectionState = getConnectionState;
-
-  public async forceRefocus() {
-    const useHere: string = await this.page.evaluate(() => {
-      return window.l10n.localeStrings[window.l10n._locale.l][0][
-        window.l10n.localeStrings['en']?.[0].findIndex(
-          (x: string) => x.toLowerCase() == 'use here'
-        ) || 257
-      ];
-    });
-    await this.page.waitForFunction(
-      `[...document.querySelectorAll("div[role=button")].find(e=>{return e.innerHTML.toLowerCase()==="${useHere.toLowerCase()}"})`,
-      { timeout: 0 }
-    );
-    await this.page.evaluate(
-      `[...document.querySelectorAll("div[role=button")].find(e=>{return e.innerHTML.toLowerCase()=="${useHere.toLowerCase()}"}).click()`
-    );
-  }
-
-  /**
-   * @event Listens to live locations from a chat that already has valid live locations
-   * @param chatId the chat from which you want to subscribes to live location updates
-   * @param fn callback that takes in a LiveLocation
-   * @returns boolean, if returns false then there were no valid live locations in the chat of chatId
-   * @emits <LiveLocation> LiveLocation
-   */
-  public onLiveLocation(
-    chatId: string,
-    fn: (liveLocationChangedEvent: LiveLocation) => void
-  ) {
-    const funcName =
-      'onLiveLocation_' + chatId.replace('_', '').replace('_', '');
-    return this.page
-      .exposeFunction(funcName, (liveLocationChangedEvent: LiveLocation) =>
-        fn(liveLocationChangedEvent)
-      )
-      .then((_) =>
-        this.page.evaluate(
-          ({ chatId, funcName }) => {
-            //@ts-ignore
-            return WAPI.onLiveLocation(chatId, window[funcName]);
-          },
-          { chatId, funcName }
-        )
-      );
-  }
-
-  /**
-   * @event Listens to add and remove evevnts on Groups
-   * @param to group id: xxxxx-yyyy@us.c
-   * @param to callback
-   * @returns Observable stream of participantChangedEvent
-   */
-  public onParticipantsChanged(
-    groupId: string,
-    fn: (participantChangedEvent: ParticipantEvent) => void
-  ) {
-    const funcName =
-      'onParticipantsChanged_' + groupId.replace('_', '').replace('_', '');
-    return this.page
-      .exposeFunction(funcName, (participantChangedEvent: ParticipantEvent) =>
-        fn(participantChangedEvent)
-      )
-      .then((_) =>
-        this.page.evaluate(
-          ({ groupId, funcName }) => {
-            //@ts-ignore
-            WAPI.onParticipantsChanged(groupId, window[funcName]);
-          },
-          { groupId, funcName }
-        )
-      );
-  }
-
-  /**
-   * @event Fires callback with Chat object every time the host phone is added to a group.
-   * @param to callback
-   * @returns Observable stream of Chats
-   */
-  public onAddedToGroup(fn: (chat: Chat) => any) {
-    const funcName = 'onAddedToGroup';
-    return this.page
-      .exposeFunction(funcName, (chat: any) => fn(chat))
-      .then((_) =>
-        this.page.evaluate(() => {
-          //@ts-ignore
-          WAPI.onAddedToGroup(window.onAddedToGroup);
-        })
-      );
-  }
 
   /**
    * Sends a text message to given chat
@@ -350,106 +295,61 @@ export class Whatsapp {
   public sendText = sendText;
 
   /**
-   * Sends a text message to given chat that includes mentions.
-   * In order to use this method correctly you will need to send the text like this:
-   * "@4474747474747 how are you?"
-   * Basically, add a @ symbol before the number of the contact you want to mention.
-   * @param to chat id: xxxxx@us.c
-   * @param content text message
+   * Sends image message
+   * @param to Chat id
+   * @param imgBase64
+   * @param filename
+   * @param caption
    */
-  public async sendTextWithMentions(to: string, content: string) {
-    return await this.page.evaluate(
-      ({ to, content }) => {
-        WAPI.sendSeen(to);
-        return WAPI.sendMessageWithTags(to, content);
-      },
-      { to, content }
-    );
-  }
-
-  public async sendMessageWithThumb(
-    thumb: string,
-    url: string,
-    title: string,
-    description: string,
-    chatId: string
-  ) {
-    return await this.page.evaluate(
-      ({ thumb, url, title, description, chatId }) => {
-        WAPI.sendMessageWithThumb(thumb, url, title, description, chatId);
-      },
-      {
-        thumb,
-        url,
-        title,
-        description,
-        chatId,
-      }
-    );
-  }
+  public sendImage = sendImage;
 
   /**
-   * Sends a location message to given chat
-   * @param to chat id: xxxxx@c.us
-   * @param lat latitude: '51.5074'
-   * @param lng longitude: '0.1278'
-   * @param loc location text: 'LONDON!'
-   */
-  // public async sendLocation(to: string, lat: any, lng: any, loc: string) {
-  //   return await this.page.evaluate(
-  //     ({ to, lat, lng, loc }) => {
-  //       WAPI.sendLocation(to, lat, lng, loc);
-  //     },
-  //     { to, lat, lng, loc }
-  //   );
-  // }
-
-  /**
-   * Get the generated user agent, this is so you can send it to the decryption module.
-   * @returns String useragent of wa-web session
-   */
-  public async getGeneratedUserAgent(userAgent: string) {
-    return await this.page.evaluate(
-      ({ userAgent }) => WAPI.getGeneratedUserAgent(userAgent),
-      { userAgent }
-    );
-  }
-
-  /**
+   * Sends text message with @tags mentions
    *
-   * @param to string chatid
-   * @param content string reply text
-   * @param quotedMsg string | Message the msg object or id to reply to.
+   * Example:
+   * "Hello @8114285934 from sulla!"
+   * @param to chat id
+   * @param content message body
+   * @returns message id
    */
-  public async reply(to: string, content: string, quotedMsg: any) {
-    return await this.page.evaluate(
-      ({ to, content, quotedMsg }) => {
-        WAPI.reply(to, content, quotedMsg);
-      },
-      { to, content, quotedMsg }
-    );
-  }
+  public sendTextWithTags = sendTextWithTags;
 
   /**
-   * Sends a file to given chat, with caption or not, using base64. This is exactly the same as sendImage
-   * @param to chat id xxxxx@us.c
-   * @param base64 base64 data:image/xxx;base64,xxx
-   * @param filename string xxxxx
-   * @param caption string xxxxx
+   * Sends message with thumbnail
+   * @param thumb
+   * @param url
+   * @param title
+   * @param description
+   * @param chatId
    */
-  public async sendFile(
-    to: string,
-    base64: string,
-    filename: string,
-    caption: string
-  ) {
-    return await this.page.evaluate(
-      ({ to, base64, filename, caption }) => {
-        WAPI.sendImage(base64, to, filename, caption);
-      },
-      { to, base64, filename, caption }
-    );
-  }
+  public sendMessageWithThumb = sendMessageWithThumb;
+
+  /**
+   * Replies to given mesage id of given chat id
+   * @param to Chat id
+   * @param content Message body
+   * @param quotedMsg Message id to reply to.
+   */
+  public reply = reply;
+
+  /**
+   * Sends file
+   * base64 parameter should have mime type already defined
+   * @param to Chat id
+   * @param base64 base64 data
+   * @param filename
+   * @param caption
+   */
+  public sendFile = sendFile;
+
+  /**
+   * Sends file from path
+   * @param to Chat id
+   * @param path File path
+   * @param filename
+   * @param caption
+   */
+  public sendFileFromPath = sendFileFromPath;
 
   /**
    * Sends a video to given chat as a gif, with caption or not, using base64
@@ -473,45 +373,20 @@ export class Whatsapp {
   }
 
   /**
-   * Sends a video to given chat as a gif by using a giphy link, with caption or not, using base64
-   * @param to chat id xxxxx@us.c
-   * @param giphyMediaUrl string https://media.giphy.com/media/oYtVHSxngR3lC/giphy.gif => https://i.giphy.com/media/oYtVHSxngR3lC/200w.mp4
-   * @param caption string xxxxx
-   */
-  public async sendGiphy(to: string, giphyMediaUrl: string, caption: string) {
-    var ue = /^https?:\/\/media\.giphy\.com\/media\/([a-zA-Z0-9]+)/;
-    var n = ue.exec(giphyMediaUrl);
-    if (n) {
-      const r = `https://i.giphy.com/${n[1]}.mp4`;
-      const filename = `${n[1]}.mp4`;
-      const base64 = await getBase64(r);
-      return await this.page.evaluate(
-        ({ to, base64, filename, caption }) => {
-          WAPI.sendVideoAsGif(base64, to, filename, caption);
-        },
-        { to, base64, filename, caption }
-      );
-    } else {
-      console.log('something is wrong with this giphy link');
-      return;
-    }
-  }
-
-  /**
    * Returns an object with all of your host device details
    */
   public async getMe() {
-    //@ts-ignore
-    return await this.page.evaluate(() => WAPI.getMe());
+    return await this.page.evaluate(() =>
+      //@ts-ignore
+      window.Store.Contact.get(window.Store.Conn.me)
+    );
   }
 
   /**
    * Returns an object with all of your host device details
    */
   public async getHost() {
-    //@ts-ignore
-    // return await this.page.evaluate(() => WAPI.getHost());
-    return await this.page.evaluate(() => Store.Me.attributes);
+    return await this.page.evaluate(() => WAPI.getHost());
   }
 
   /**
@@ -670,7 +545,7 @@ export class Whatsapp {
    * @param groupId group id
    */
   public async getGroupMembersId(groupId: string) {
-    return await this.page.evaluate(
+    return this.page.evaluate(
       (groupId) => WAPI.getGroupParticipantIDs(groupId),
       groupId
     );
@@ -681,10 +556,7 @@ export class Whatsapp {
    * @param groupId group id
    */
   public async leaveGroup(groupId: string) {
-    return await this.page.evaluate(
-      (groupId) => WAPI.leaveGroup(groupId),
-      groupId
-    );
+    return this.page.evaluate((groupId) => WAPI.leaveGroup(groupId), groupId);
   }
 
   /**
@@ -696,7 +568,7 @@ export class Whatsapp {
     const actions = membersIds.map((memberId) => {
       return this.getContact(memberId._serialized);
     });
-    return await Promise.all(actions);
+    return Promise.all(actions);
   }
 
   /**
@@ -704,9 +576,8 @@ export class Whatsapp {
    * @param contactId
    * @returns contact detial as promise
    */
-  //@ts-ignore
   public async getContact(contactId: string) {
-    return await this.page.evaluate(
+    return this.page.evaluate(
       (contactId) => WAPI.getContact(contactId),
       contactId
     );
@@ -718,7 +589,7 @@ export class Whatsapp {
    * @returns contact detial as promise
    */
   public async getChatById(contactId: string) {
-    return await this.page.evaluate(
+    return this.page.evaluate(
       (contactId) => WAPI.getChatById(contactId),
       contactId
     );
@@ -730,7 +601,7 @@ export class Whatsapp {
    * @returns contact detial as promise
    */
   public async getChat(contactId: string) {
-    return await this.page.evaluate(
+    return this.page.evaluate(
       (contactId) => WAPI.getChat(contactId),
       contactId
     );
@@ -742,7 +613,7 @@ export class Whatsapp {
    * @returns Url of the chat picture or undefined if there is no picture for the chat.
    */
   public async getProfilePicFromServer(chatId: string) {
-    return await this.page.evaluate(
+    return this.page.evaluate(
       (chatId) => WAPI.getProfilePicFromServer(chatId),
       chatId
     );
@@ -753,7 +624,7 @@ export class Whatsapp {
    * @param chatId chat id: xxxxx@us.c
    */
   public async sendSeen(chatId: string) {
-    return await this.page.evaluate((chatId) => WAPI.sendSeen(chatId), chatId);
+    return this.page.evaluate((chatId) => WAPI.sendSeen(chatId), chatId);
   }
 
   /**
@@ -1081,12 +952,6 @@ export class Whatsapp {
       { to, message, mentioned }
     );
   }
-  /**
-   * Sends a image message to given chat
-   * @param to chat id: xxxxx@us.c
-   * @param content text message
-   */
-  public sendImage = sendImage;
 
   /**
    * TODO: Fix message not being delivered
@@ -1114,6 +979,37 @@ export class Whatsapp {
         WAPI.sendLocation(to, latitude, longitude, caption);
       },
       { to, latitude, longitude, caption }
+    );
+  }
+
+  /**
+   * Get the generated user agent, this is so you can send it to the decryption module.
+   * @returns String useragent of wa-web session
+   */
+  public async getGeneratedUserAgent(userAgent: string) {
+    return await this.page.evaluate(
+      ({ userAgent }) => WAPI.getGeneratedUserAgent(userAgent),
+      { userAgent }
+    );
+  }
+
+  /**
+   * Clicks on 'use here' button (When it get unlaunched)
+   */
+  public async useHere() {
+    const useHere: string = await this.page.evaluate(() => {
+      return window.l10n.localeStrings[window.l10n._locale.l][0][
+        window.l10n.localeStrings['en']?.[0].findIndex(
+          (x: string) => x.toLowerCase() == 'use here'
+        ) || 257
+      ];
+    });
+    await this.page.waitForFunction(
+      `[...document.querySelectorAll("div[role=button")].find(e=>{return e.innerHTML.toLowerCase()==="${useHere.toLowerCase()}"})`,
+      { timeout: 0 }
+    );
+    await this.page.evaluate(
+      `[...document.querySelectorAll("div[role=button")].find(e=>{return e.innerHTML.toLowerCase()=="${useHere.toLowerCase()}"}).click()`
     );
   }
 

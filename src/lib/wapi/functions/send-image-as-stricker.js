@@ -1,4 +1,4 @@
-import { base64ImageToFile } from '../helper/base64-to-file';
+import { base64ToFile } from '../helper/base64-to-file';
 import { sendSticker } from './send-sticker';
 
 /**
@@ -8,7 +8,7 @@ import { sendSticker } from './send-sticker';
  * @param {*} metadata sharp metadata: (https://sharp.pixelplumbing.com/api-input#metadata)
  */
 export async function sendImageAsSticker(imageBase64, chatId, metadata) {
-  const mediaBlob = base64ImageToFile(
+  const mediaBlob = base64ToFile(
     'data:image/webp;base64,' + imageBase64,
     'file.webp'
   );

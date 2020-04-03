@@ -1,4 +1,5 @@
 import { processFiles } from './process-files';
+import { base64ToFile } from '../helper';
 
 /**
  * Sends video as a gif to given chat id
@@ -12,7 +13,7 @@ export function sendVideoAsGif(imgBase64, chatid, filename, caption, done) {
   // const idUser = new window.Store.UserConstructor(chatid);
   const idUser = new Store.WidFactory.createWid(chatid);
   return Store.Chat.find(idUser).then((chat) => {
-    var mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
+    var mediaBlob = base64ToFile(imgBase64, filename);
     processFiles(chat, mediaBlob).then((mc) => {
       var media = mc.models[0];
       media.mediaPrep._mediaData.isGif = true;
