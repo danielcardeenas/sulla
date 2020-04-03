@@ -7,4 +7,4 @@ export { getConnectionState } from './get-connection-state';
 export { sendTextWithTags } from './send-text-with-tags';
 export { sendMessageWithThumb } from './send-message-with-thumb';
 export { reply } from './reply';
-export { sendFile, sendFileFromPath } from './send-file';
+export { sendFile, sendFileFromBase64 } from './send-file';

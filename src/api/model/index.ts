@@ -10,3 +10,4 @@ export { ParticipantEvent } from './participant-event';
 export { PartialMessage } from './partial-message';
 export { Ack } from './ack';
 export { AckType } from './enum/ack-type';
+export { HostDevice } from './host-device';

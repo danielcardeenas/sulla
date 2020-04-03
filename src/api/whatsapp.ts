@@ -10,7 +10,7 @@ import {
   setChatState,
   setProfileName,
   setProfileStatus,
-  sendFileFromPath,
+  sendFileFromBase64,
 } from './functions';
 import { sendText } from './functions/send-text';
 import { base64MimeType } from './helpers';
@@ -22,6 +22,7 @@ import {
   Id,
   PartialMessage,
   ParticipantEvent,
+  HostDevice,
 } from './model';
 import { SocketState } from './model/enum/socket-state';
 import { LiveLocation } from './model/live-location';
@@ -59,12 +60,6 @@ declare module WAPI {
   const deleteConversation: (chatId: string) => boolean;
   const clearChat: (chatId: string) => void;
   const getGroupInviteLink: (chatId: string) => Promise<string> | boolean;
-  const sendImage: (
-    base64: string,
-    to: string,
-    filename: string,
-    caption: string
-  ) => void;
   const getBusinessProfilesProducts: (to: string) => any;
   const sendImageWithProduct: (
     base64: string,
@@ -73,12 +68,6 @@ declare module WAPI {
     bizNumber: string,
     productId: string
   ) => any;
-  const sendFile: (
-    base64: string,
-    to: string,
-    filename: string,
-    caption: string
-  ) => void;
   const sendVideoAsGif: (
     base64: string,
     to: string,
@@ -87,8 +76,7 @@ declare module WAPI {
   ) => void;
   const getAllContacts: () => Contact[];
   const getWAVersion: () => String;
-  const getMe: () => any;
-  const getHost: () => any;
+  const getHost: () => HostDevice;
   const getAllUnreadMessages: () => PartialMessage[];
   const getAllChatsWithMessages: (withNewMessageOnly?: boolean) => any;
   const getAllChats: () => Chat[];
@@ -110,7 +98,8 @@ declare module WAPI {
     onlyLocal: boolean
   ) => any;
   const sendContact: (to: string, contact: string | string[]) => any;
-  const simulateTyping: (to: string, on: boolean) => void;
+  const startTyping: (to: string) => void;
+  const stopTyping: (to: string) => void;
   const isConnected: () => Boolean;
   const loadEarlierMessages: (contactId: string) => Message[];
   const loadAllEarlierMessages: (contactId: string) => void;
@@ -340,7 +329,7 @@ export class Whatsapp {
    * @param filename
    * @param caption
    */
-  public sendFile = sendFile;
+  public sendFileFromBase64 = sendFileFromBase64;
 
   /**
    * Sends file from path
@@ -349,7 +338,7 @@ export class Whatsapp {
    * @param filename
    * @param caption
    */
-  public sendFileFromPath = sendFileFromPath;
+  public sendFile = sendFile;
 
   /**
    * Sends a video to given chat as a gif, with caption or not, using base64
@@ -375,17 +364,7 @@ export class Whatsapp {
   /**
    * Returns an object with all of your host device details
    */
-  public async getMe() {
-    return await this.page.evaluate(() =>
-      //@ts-ignore
-      window.Store.Contact.get(window.Store.Conn.me)
-    );
-  }
-
-  /**
-   * Returns an object with all of your host device details
-   */
-  public async getHost() {
+  public async getHostDevice() {
     return await this.page.evaluate(() => WAPI.getHost());
   }
 
@@ -443,15 +422,19 @@ export class Whatsapp {
   }
 
   /**
-   * Simulate '...typing' in chat
-   * @param {string} to 'xxxx@c.us'
-   * @param {boolean} on turn on similated typing, false to turn it off you need to manually turn this off.
+   * Simulates '...typing' state
+   * @param {string} to Chat id
    */
-  public async simulateTyping(to: string, on: boolean) {
-    return await this.page.evaluate(
-      ({ to, on }) => WAPI.simulateTyping(to, on),
-      { to, on }
-    );
+  public async startTyping(to: string) {
+    return await this.page.evaluate(({ to }) => WAPI.startTyping(to), { to });
+  }
+
+  /**
+   * Stops typing
+   * @param to Chat id
+   */
+  public async stopTyping(to: string) {
+    return await this.page.evaluate(({ to }) => WAPI.stopTyping(to), { to });
   }
 
   /**

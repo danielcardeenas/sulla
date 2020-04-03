@@ -64,3 +64,8 @@ export { sendSticker } from './send-sticker';
 export { sendVideoAsGif } from './send-video-as-gif';
 export { setMyName } from './set-my-name';
 export { setMyStatus } from './set-my-status';
+export { forwardMessages } from './forward-messages';
+export { sendContact } from './send-contact';
+export { getNewMessageId } from './get-new-message-id';
+export { reply } from './reply';
+export { startTyping, stopTyping } from './simulate-typing';

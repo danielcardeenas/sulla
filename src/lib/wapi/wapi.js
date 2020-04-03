@@ -63,6 +63,12 @@ import {
   setMyName,
   setMyStatus,
   _getGroupParticipants,
+  forwardMessages,
+  sendContact,
+  getNewMessageId,
+  reply,
+  startTyping,
+  stopTyping,
 } from './functions';
 import { base64ToFile, generateMediaKey, getFileHash } from './helper';
 import {
@@ -223,55 +229,6 @@ window.WAPI.getMessageById = function (id, done) {
     done(result);
   } else {
     return result;
-  }
-};
-
-window.WAPI.ReplyMessage = function (idMessage, message, done) {
-  var messageObject = window.Store.Msg.get(idMessage);
-  if (messageObject === undefined) {
-    if (done !== undefined) done(false);
-    return false;
-  }
-  messageObject = messageObject.value();
-
-  const chat = WAPI.getChat(messageObject.chat.id);
-  if (chat !== undefined) {
-    if (done !== undefined) {
-      chat.sendMessage(message, null, messageObject).then(function () {
-        function sleep(ms) {
-          return new Promise((resolve) => setTimeout(resolve, ms));
-        }
-
-        var trials = 0;
-
-        function check() {
-          for (let i = chat.msgs.models.length - 1; i >= 0; i--) {
-            let msg = chat.msgs.models[i];
-
-            if (!msg.senderObj.isMe || msg.body != message) {
-              continue;
-            }
-            done(WAPI._serializeMessageObj(msg));
-            return True;
-          }
-          trials += 1;
-          console.log(trials);
-          if (trials > 30) {
-            done(true);
-            return;
-          }
-          sleep(500).then(check);
-        }
-        check();
-      });
-      return true;
-    } else {
-      chat.sendMessage(message, null, messageObject);
-      return true;
-    }
-  } else {
-    if (done !== undefined) done(false);
-    return false;
   }
 };
 
@@ -525,86 +482,19 @@ window.WAPI.processFiles = processFiles;
 window.WAPI.sendImageWithProduct = sendImageWithProduct;
 window.WAPI.base64ImageToFile = base64ToFile;
 window.WAPI.base64ToFile = base64ToFile;
-
-/**
- * Send contact card to a specific chat using the chat ids
- *
- * @param {string} to '000000000000@c.us'
- * @param {string|array} contact '111111111111@c.us' | ['222222222222@c.us', '333333333333@c.us, ... 'nnnnnnnnnnnn@c.us']
- */
-window.WAPI.sendContact = function (to, contact) {
-  if (!Array.isArray(contact)) {
-    contact = [contact];
-  }
-  contact = contact.map((c) => {
-    return WAPI.getChat(c).__x_contact;
-  });
-
-  if (contact.length > 1) {
-    window.WAPI.getChat(to).sendContactList(contact);
-  } else if (contact.length === 1) {
-    window.WAPI.getChat(to).sendContact(contact[0]);
-  }
-};
-
-/**
- * Forward an array of messages to a specific chat using the message ids or Objects
- *
- * @param {string} to '000000000000@c.us'
- * @param {string|array[Message | string]} messages this can be any mixture of message ids or message objects
- * @param {boolean} skipMyMessages This indicates whether or not to skip your own messages from the array
- */
-window.WAPI.forwardMessages = async function (to, messages, skipMyMessages) {
-  if (!Array.isArray(messages)) {
-    messages = [messages];
-  }
-  const finalForwardMessages = messages
-    .map((msg) => {
-      if (typeof msg == 'string') {
-        //msg is string, get the message object
-        return window.Store.Msg.get(msg);
-      } else {
-        return window.Store.Msg.get(msg.id);
-      }
-    })
-    .filter((msg) => (skipMyMessages ? !msg.__x_isSentByMe : true));
-
-  // let userId = new window.Store.UserConstructor(to);
-  let conversation = window.Store.Chat.get(to);
-  return await conversation.forwardMessages(finalForwardMessages);
-};
-
-/**
- * Create an chat ID based in a cloned one
- *
- * @param {string} chatId '000000000000@c.us'
- */
-window.WAPI.getNewMessageId = function (chatId) {
-  var newMsgId = new Store.MsgKey(
-    Object.assign({}, Store.Msg.models[0].__x_id)
-  );
-  // .clone();
-
-  newMsgId.fromMe = true;
-  newMsgId.id = WAPI.getNewId().toUpperCase();
-  newMsgId.remote = chatId;
-  newMsgId._serialized = `${newMsgId.fromMe}_${newMsgId.remote}_${newMsgId.id}`;
-
-  return newMsgId;
-};
-
-/**
- * Simulate '...typing' in the chat.
- *
- * @param {string} chatId '000000000000@c.us'
- * @param {boolean} on true to turn on similated typing, false to turn it off //you need to manually turn this off.
- */
-window.WAPI.simulateTyping = async function (chatId, on) {
-  if (on) await Store.ChatStates.sendChatStateComposing(chatId);
-  else await Store.ChatStates.sendChatStatePaused(chatId);
-};
-
+window.WAPI.sendContact = sendContact;
+window.WAPI.forwardMessages = forwardMessages;
+window.WAPI.getNewMessageId = getNewMessageId;
+window.WAPI.reply = reply;
+window.WAPI._sendSticker = sendSticker;
+window.WAPI.getFileHash = getFileHash;
+window.WAPI.generateMediaKey = generateMediaKey;
+window.WAPI.encryptAndUploadFile = encryptAndUploadFile;
+window.WAPI.sendImageAsSticker = sendImageAsSticker;
+window.WAPI.startTyping = startTyping;
+window.WAPI.stopTyping = stopTyping;
 window.WAPI.sendLocation = sendLocation;
+
 window.WAPI.sendButtons = async function (chatId) {
   var chat = Store.Chat.get(chatId);
   var tempMsg = Object.create(chat.msgs.filter((msg) => msg.__x_isSentByMe)[0]);
@@ -942,32 +832,6 @@ window.WAPI.sendButtons2 = async function (chatId) {
     });
 };
 
-window.WAPI.reply = async function (chatId, body, quotedMsg) {
-  if (typeof quotedMsg !== 'object') quotedMsg = Store.Msg.get(quotedMsg);
-  var chat = Store.Chat.get(chatId);
-  let extras = {
-    quotedParticipant: quotedMsg.author || quotedMsg.from,
-    quotedStanzaID: quotedMsg.id.id,
-  };
-  var tempMsg = Object.create(chat.msgs.filter((msg) => msg.__x_isSentByMe)[0]);
-  var newId = window.WAPI.getNewMessageId(chatId);
-  var extend = {
-    ack: 0,
-    id: newId,
-    local: !0,
-    self: 'out',
-    t: parseInt(new Date().getTime() / 1000),
-    to: chatId,
-    isNewMsg: !0,
-    type: 'chat',
-    quotedMsg,
-    body,
-    ...extras,
-  };
-  Object.assign(tempMsg, extend);
-  await Store.addAndSendMsgToChat(chat, tempMsg);
-};
-
 /**
  * Send Payment Request
  *
@@ -1052,6 +916,7 @@ window.WAPI.sendVCard = function (chatId, vcard) {
 
   Store.addAndSendMsgToChat(chat, tempMsg);
 };
+
 /**
  * Block contact
  * @param {string} id '000000000000@c.us'
@@ -1067,6 +932,7 @@ window.WAPI.contactBlock = function (id, done) {
   done(false);
   return false;
 };
+
 /**
  * unBlock contact
  * @param {string} id '000000000000@c.us'
@@ -1147,17 +1013,9 @@ window.WAPI.demoteParticipant = function (idGroup, idParticipant, done) {
   );
 };
 
-window.WAPI._sendSticker = sendSticker;
-window.WAPI.getFileHash = getFileHash;
-window.WAPI.generateMediaKey = generateMediaKey;
-
 /**
- * @param type: The type of file.  {'audio' | 'sticker' | 'video' | 'product' | 'document' | 'gif' | 'image' | 'ptt' | 'template' | 'history' | 'ppic'}
- * @param blob: file
+ * New version of @tag message
  */
-window.WAPI.encryptAndUploadFile = encryptAndUploadFile;
-window.WAPI.sendImageAsSticker = sendImageAsSticker;
-
 window.WAPI.sendMessageMentioned = async function (chatId, message, mentioned) {
   var chat = WAPI.getChat(chatId);
   const user = await Store.Contact.serialize().find(
@@ -1170,23 +1028,4 @@ window.WAPI.sendMessageMentioned = async function (chatId, message, mentioned) {
     quotedMsg: null,
     quotedMsgAdminGroupJid: null,
   });
-};
-
-/**
-This will dump all possible stickers into the chat. ONLY FOR TESTING. THIS IS REALLY ANNOYING!!
-*/
-window.WAPI._STICKERDUMP = async function (chatId) {
-  var chat = Store.Chat.get(chatId);
-  let prIdx = await Store.StickerPack.pageWithIndex(0);
-  await Store.StickerPack.fetchAt(0);
-  await Store.StickerPack._pageFetchPromises[prIdx];
-  return await Promise.race(
-    Store.StickerPack.models.forEach((pack) =>
-      pack.stickers
-        .fetch()
-        .then((_) =>
-          pack.stickers.models.forEach((stkr) => stkr.sendToChat(chat))
-        )
-    )
-  ).catch((e) => {});
 };

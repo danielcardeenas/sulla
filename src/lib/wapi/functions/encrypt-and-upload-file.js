@@ -6,11 +6,11 @@ import { generateMediaKey, getFileHash } from '../helper';
  * @param {Blob} blob
  */
 export async function encryptAndUploadFile(type, blob) {
-  let filehash = await getFileHash(blob);
-  let mediaKey = generateMediaKey(32);
-  let controller = new AbortController();
-  let signal = controller.signal;
-  let encrypted = await window.Store.UploadUtils.encryptAndUpload({
+  const filehash = await getFileHash(blob);
+  const mediaKey = generateMediaKey(32);
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const encrypted = await window.Store.UploadUtils.encryptAndUpload({
     blob,
     type,
     signal,

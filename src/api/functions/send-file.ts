@@ -18,10 +18,11 @@ declare module WAPI {
  */
 export async function sendFile(
   to: string,
-  base64: string,
+  path: string,
   filename: string,
   caption?: string
 ) {
+  const base64 = await fileToBase64(path);
   return await this.page.evaluate(
     ({ to, base64, filename, caption }) => {
       WAPI.sendFile(base64, to, filename, caption);
@@ -37,13 +38,12 @@ export async function sendFile(
  * @param filename
  * @param caption
  */
-export async function sendFileFromPath(
+export async function sendFileFromBase64(
   to: string,
-  path: string,
+  base64: string,
   filename: string,
   caption?: string
 ) {
-  const base64 = await fileToBase64(path);
   return await this.page.evaluate(
     ({ to, base64, filename, caption }) => {
       WAPI.sendFile(base64, to, filename, caption);
