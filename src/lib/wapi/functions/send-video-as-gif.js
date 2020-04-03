@@ -1,0 +1,24 @@
+import { processFiles } from './process-files';
+
+/**
+ * Sends video as a gif to given chat id
+ * @param {string} imgBase64
+ * @param {string} chatid
+ * @param {string} filename
+ * @param {string} caption
+ * @param {Function} done Optional callback
+ */
+export function sendVideoAsGif(imgBase64, chatid, filename, caption, done) {
+  // const idUser = new window.Store.UserConstructor(chatid);
+  const idUser = new Store.WidFactory.createWid(chatid);
+  return Store.Chat.find(idUser).then((chat) => {
+    var mediaBlob = window.WAPI.base64ImageToFile(imgBase64, filename);
+    processFiles(chat, mediaBlob).then((mc) => {
+      var media = mc.models[0];
+      media.mediaPrep._mediaData.isGif = true;
+      media.mediaPrep._mediaData.gifAttribution = 1;
+      media.mediaPrep.sendToChat(chat, { caption: caption });
+      if (done !== undefined) done(true);
+    });
+  });
+}

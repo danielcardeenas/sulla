@@ -1,3 +1,5 @@
+import { AckType } from './enum/ack-type';
+
 export interface Message {
   id: string;
   body: string;
@@ -12,7 +14,7 @@ export interface Message {
   to: string;
   self: string;
   duration?: string | number;
-  ack: number;
+  ack: AckType;
   invis: boolean;
   isNewMsg: boolean;
   star: boolean;

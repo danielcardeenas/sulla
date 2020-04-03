@@ -1,9 +1,9 @@
-import * as fs from 'fs';
+import { fileToBase64 } from '../helpers/file-to-base64';
 
 declare module WAPI {
   const sendImage: (
-    to: string,
     imgBase64: string,
+    to: string,
     filename: string,
     caption: string
   ) => any;
@@ -22,12 +22,10 @@ export async function sendImage(
   filename: string,
   caption?: string
 ) {
-  const base64 = fs.readFileSync(path, { encoding: 'base64' });
-  const data = `data:${'image/jpeg'};base64,${base64}`;
-
+  const data = fileToBase64(path);
   return await this.page.evaluate(
     ({ to, data, filename, caption }) => {
-      WAPI.sendImage(to, data, filename, caption);
+      WAPI.sendImage(data, to, filename, caption);
     },
     { to, data, filename, caption }
   );

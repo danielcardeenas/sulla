@@ -1,9 +1,17 @@
 import axios from 'axios';
 import { Page } from 'puppeteer';
 import * as sharp from 'sharp';
+import {
+  getConnectionState,
+  sendImage,
+  setChatState,
+  setProfileName,
+  setProfileStatus,
+} from './functions';
 import { sendText } from './functions/send-text';
 import { ExposedFn } from './helpers/exposed.enum';
 import {
+  Ack,
   Chat,
   ChatState,
   Contact,
@@ -13,16 +21,16 @@ import {
 } from './model';
 import { LiveLocation } from './model/live-location';
 import { Message } from './model/message';
+import { SocketState } from './model/enum/socket-state';
 declare module WAPI {
   const waitNewMessages: (rmCallback: boolean, callback: Function) => void;
   const allNewMessagesListener: (callback: Function) => void;
-  const onStateChanged: (callback: Function) => void;
+  const onStateChange: (callback: Function) => void;
   const onAddedToGroup: (callback: Function) => any;
   const onParticipantsChanged: (groupId: string, callback: Function) => any;
   const onLiveLocation: (chatId: string, callback: Function) => any;
   const sendMessage: (to: string, content: string) => string;
   const sendMessageWithTags: (to: string, content: string) => string;
-  const setChatState: (chatState: ChatState, chatId: string) => void;
   const reply: (
     to: string,
     content: string,
@@ -36,8 +44,6 @@ declare module WAPI {
   ) => any;
   const sendLocation: (to: string, lat: any, lng: any, loc: string) => void;
   const addParticipant: (groupId: string, contactId: string) => void;
-  const setMyName: (newName: string) => void;
-  const setMyStatus: (newStatus: string) => void;
   const getStatus: (contactId: string) => void;
   const getGroupAdmins: (groupId: string) => Contact[];
   const removeParticipant: (groupId: string, contactId: string) => void;
@@ -92,6 +98,7 @@ declare module WAPI {
   const getAllContacts: () => Contact[];
   const getWAVersion: () => String;
   const getMe: () => any;
+  const getHost: () => any;
   const getAllUnreadMessages: () => PartialMessage[];
   const getAllChatsWithMessages: (withNewMessageOnly?: boolean) => any;
   const getAllChats: () => Chat[];
@@ -202,91 +209,51 @@ export class Whatsapp {
    * @event Listens to messages received
    * @returns Observable stream of messages
    */
-  public onStateChanged(fn: (state: string) => void) {
+  public onStateChange(fn: (state: SocketState) => void) {
     this.page
-      .exposeFunction(ExposedFn.onStateChanged, (state: string) => fn(state))
+      .exposeFunction(ExposedFn.onStateChange, (state: SocketState) =>
+        fn(state)
+      )
       .then(() =>
         this.page.evaluate(() => {
-          WAPI.onStateChanged((_) => window['onStateChanged'](_.state));
+          WAPI.onStateChange((_) => window['onStateChange'](_.state));
         })
       );
-  }
-
-  /**
-   * set your about me
-   * @param newStatus String new profile status
-   */
-  public async setMyStatus(newStatus: string) {
-    return await this.page.evaluate(
-      ({ newStatus }) => {
-        WAPI.setMyStatus(newStatus);
-      },
-      { newStatus }
-    );
-  }
-
-  /**
-   * Set your profile name
-   * @param newName String new name to set for your profile
-   */
-  public async setMyName(newName: string) {
-    return await this.page.evaluate(
-      ({ newName }) => {
-        WAPI.setMyName(newName);
-      },
-      { newName }
-    );
-  }
-
-  /**
-   * Sets the chat state
-   * @param {ChatState|0|1|2} chatState The state you want to set for the chat. Can be TYPING (0), RECRDING (1) or PAUSED (2).
-   * @param {String} chatId
-   */
-  public async setChatState(chatState: ChatState, chatId: String) {
-    return await this.page.evaluate(
-      ({ chatState, chatId }) => {
-        WAPI.setChatState(chatState, chatId);
-      },
-      //@ts-ignore
-      { chatState, chatId }
-    );
-  }
-
-  /**
-   * Returns the connecction state
-   * @returns Any of OPENING, PAIRING, UNPAIRED, UNPAIRED_IDLE, CONNECTED, TIMEOUT, CONFLICT, UNLAUNCHED, PROXYBLOCK, TOS_BLOCK, SMB_TOS_BLOCK, DEPRECATED_VERSION
-   */
-  public async getConnectionState() {
-    return await this.page.evaluate(() => {
-      //@ts-ignore
-      return Store.State.default.state;
-    });
   }
 
   /**
    * @event Listens to messages acknowledgement Changes
    * @returns Observable stream of messages
    */
-  public onAck(fn: (message: Message) => void) {
-    this.page.exposeFunction(ExposedFn.onAck, (message: Message) =>
-      fn(message)
-    );
+  public onAck(fn: (ack: Ack) => void) {
+    this.page.exposeFunction(ExposedFn.onAck, (ack: Ack) => fn(ack));
   }
 
   /**
-   * Shuts down the page and browser
-   * @returns true
+   * Sets current user profile status
+   * @param status
    */
-  public async kill() {
-    console.log('Shutting Down');
-    if (this.page) await this.page.close();
-    if (this.page.browser) await this.page.browser().close();
-    return true;
-  }
+  public setProfileStatus = setProfileStatus;
+
+  /**
+   * Sets current user profile name
+   * @param name
+   */
+  public setProfileName = setProfileName;
+
+  /**
+   * Sets the chat state
+   * @param {ChatState} chatState Chat state to be set (TYPING (0), RECRDING (1) or PAUSED (2)).
+   * @param {String} chatId
+   */
+  public setChatState = setChatState;
+
+  /**
+   * Retrieves the connecction state
+   */
+  public getConnectionState = getConnectionState;
 
   public async forceRefocus() {
-    //255 is the address of 'use here'
     const useHere: string = await this.page.evaluate(() => {
       return window.l10n.localeStrings[window.l10n._locale.l][0][
         window.l10n.localeStrings['en']?.[0].findIndex(
@@ -428,14 +395,14 @@ export class Whatsapp {
    * @param lng longitude: '0.1278'
    * @param loc location text: 'LONDON!'
    */
-  public async sendLocation(to: string, lat: any, lng: any, loc: string) {
-    return await this.page.evaluate(
-      ({ to, lat, lng, loc }) => {
-        WAPI.sendLocation(to, lat, lng, loc);
-      },
-      { to, lat, lng, loc }
-    );
-  }
+  // public async sendLocation(to: string, lat: any, lng: any, loc: string) {
+  //   return await this.page.evaluate(
+  //     ({ to, lat, lng, loc }) => {
+  //       WAPI.sendLocation(to, lat, lng, loc);
+  //     },
+  //     { to, lat, lng, loc }
+  //   );
+  // }
 
   /**
    * Get the generated user agent, this is so you can send it to the decryption module.
@@ -445,27 +412,6 @@ export class Whatsapp {
     return await this.page.evaluate(
       ({ userAgent }) => WAPI.getGeneratedUserAgent(userAgent),
       { userAgent }
-    );
-  }
-
-  /**
-   * Sends a image to given chat, with caption or not, using base64
-   * @param to chat id xxxxx@us.c
-   * @param base64 base64 data:image/xxx;base64,xxx
-   * @param filename string xxxxx
-   * @param caption string xxxxx
-   */
-  public async sendImage(
-    to: string,
-    base64: string,
-    filename: string,
-    caption: string
-  ) {
-    return await this.page.evaluate(
-      ({ to, base64, filename, caption }) => {
-        WAPI.sendImage(base64, to, filename, caption);
-      },
-      { to, base64, filename, caption }
     );
   }
 
@@ -555,8 +501,16 @@ export class Whatsapp {
    * Returns an object with all of your host device details
    */
   public async getMe() {
-    // return await this.page.evaluate(() => WAPI.getMe());
     //@ts-ignore
+    return await this.page.evaluate(() => WAPI.getMe());
+  }
+
+  /**
+   * Returns an object with all of your host device details
+   */
+  public async getHost() {
+    //@ts-ignore
+    // return await this.page.evaluate(() => WAPI.getHost());
     return await this.page.evaluate(() => Store.Me.attributes);
   }
 
@@ -1128,38 +1082,46 @@ export class Whatsapp {
     );
   }
   /**
-   * Sends a text message to given chat
+   * Sends a image message to given chat
    * @param to chat id: xxxxx@us.c
    * @param content text message
    */
-  // public sendImage = sendImage;
+  public sendImage = sendImage;
 
-  // /**
-  //  * TODO: Fix message not being delivered
-  //  * Sends location to given chat id
-  //  * @param to Chat id
-  //  * @param latitude Latitude
-  //  * @param longitude Longitude
-  //  * @param caption Text caption
-  //  */
-  // public async sendLocation(
-  //   to: string,
-  //   latitude: number,
-  //   longitude: number,
-  //   title?: string,
-  //   subtitle?: string
-  // ) {
-  //   // Create caption
-  //   let caption = title || '';
-  //   if (subtitle) {
-  //     caption = `${title}\n${subtitle}`;
-  //   }
+  /**
+   * TODO: Fix message not being delivered
+   * Sends location to given chat id
+   * @param to Chat id
+   * @param latitude Latitude
+   * @param longitude Longitude
+   * @param caption Text caption
+   */
+  public async sendLocation(
+    to: string,
+    latitude: number,
+    longitude: number,
+    title?: string,
+    subtitle?: string
+  ) {
+    // Create caption
+    let caption = title || '';
+    if (subtitle) {
+      caption = `${title}\n${subtitle}`;
+    }
 
-  //   return await this.page.evaluate(
-  //     ({ to, latitude, longitude, caption }) => {
-  //       WAPI.sendLocation(to, latitude, longitude, caption);
-  //     },
-  //     { to, latitude, longitude, caption }
-  //   );
-  // }
+    return await this.page.evaluate(
+      ({ to, latitude, longitude, caption }) => {
+        WAPI.sendLocation(to, latitude, longitude, caption);
+      },
+      { to, latitude, longitude, caption }
+    );
+  }
+
+  /**
+   * Closes page and browser
+   */
+  public async close() {
+    if (this.page) await this.page.close();
+    if (this.page.browser) await this.page.browser().close();
+  }
 }

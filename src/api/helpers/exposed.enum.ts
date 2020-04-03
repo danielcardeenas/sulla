@@ -3,5 +3,5 @@ export enum ExposedFn {
   OnAnyMessage = 'onAnyMessage',
   onAck = 'onAck',
   onParticipantsChanged = 'onParticipantsChanged',
-  onStateChanged = 'onStateChanged',
+  onStateChange = 'onStateChange',
 }
