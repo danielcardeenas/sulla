@@ -58,10 +58,10 @@ sulla.create('support').then((supportBot) => {...});
 ```
 <br>
 
-## Usage
-For further look, every function available can be found in [here](/src/api/layers). 
+## Basic functions (usage)
+Not every available function is listed, for further look, every function available can be found in [here](/src/api/layers). 
 
-#### Sending
+#### Chatting
 ```javascript
 // Send basic text
 await client.sendText(chatId, '👋 Hello from sulla!');
@@ -103,6 +103,72 @@ await client.startTyping(chatId);
 // Stop typing
 await client.stopTyping(chatId);
 
+// Set chat state (0: Typing, 1: Recording, 2: Paused)
+await client.setChatState(chatId, 0 | 1 | 2)
+
+```
+
+### Group functions
+```javascript
+// groupId or chatId: leaveGroup 52123123-323235@g.us
+
+// Leave group
+await client.leaveGroup(groupId);
+
+// Get group members
+await client.getGroupMembers(groupId);
+
+// Get group members ids
+await client.getGroupMembersIds(groupId);
+
+// Generate group invite url link
+await client.getGroupInviteLink(groupId);
+
+// Create group (title, participants to add)
+await client.createGroup('Group name', ['123123@c.us', '45456456@c.us']);
+
+// Remove participant
+await client.removeParticipant(groupId, '123123@c.us');
+
+// Add participant
+await client.addParticipant(groupId, '123123@c.us');
+
+// Promote participant (Give admin privileges)
+await client.promoteParticipant(groupId, '123123@c.us');
+
+// Demote particiapnt (Revoke admin privileges)
+await client.demoteParticipant(groupId, '123123@c.us');
+
+// Get group admins
+await client.getGroupAdmins(groupId);
+
+```
+
+### Profile functions
+```javascript
+// Set client status
+await client.setProfileStatus('On vacations! ✈️');
+
+// Set client profile name
+await client.setProfileName('Sulla bot');
+```
+
+### Device functions
+```javascript
+// Get device info
+await client.getHostDevice();
+
+// Get connection state
+await client.getConnectionState();
+
+// Get battery level
+await client.getBatteryLevel();
+
+// Is connected
+await client.isConnected();
+
+// Get whatsapp web version
+await client.getWAVersion();
 ```
 
 #### Events
@@ -138,6 +204,37 @@ client.onAddedToGroup(chatEvent => {
   ...
 });
 
+```
+
+### Other
+```javascript
+// Delete chat
+await client.deleteChat(chatId);
+
+// Clear chat messages
+await client.clearChat(chatId);
+
+// Delete message (last parameter: delete only locally)
+await client.deleteMessage(chatId, message.id.toString(), false)
+```
+
+## Misc
+There are some tricks for a better usage of sulla.
+
+#### Keep session alive:
+```javascript
+// In case of being logged out of whatsapp web
+// Force it to keep the current session
+client.onStateChange((state) => {
+  if (state === 'UNLAUNCHED') {
+    client.useHere();
+  }
+});
+```
+
+#### Send message to new contacts (non-added)
+```javascript
+await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋')
 ```
 
 ## Maintainers
