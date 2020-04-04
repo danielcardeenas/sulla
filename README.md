@@ -11,11 +11,16 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/danielcardeenas/sulla)
 [![GitHub license](https://img.shields.io/github/license/danielcardeenas/sulla)](https://github.com/danielcardeenas/sulla/blob/master/LICENSE)
 
-> Sulla is a javascript library which provides a high-level API control to Whatsapp so it can be configured to automatize resposes or any data that goes trough Whatsapp effortlessly.
+> Sulla is a javascript library which provides a high-level API control to
+> Whatsapp so it can be configured to automatize resposes or any data that goes
+> trough Whatsapp effortlessly.
 >
-> It is built using [puppeteer](https://github.com/GoogleChrome/puppeteer) and based on [this python wrapper](https://github.com/mukulhase/WebWhatsapp-Wrapper)
+> It is built using [puppeteer](https://github.com/GoogleChrome/puppeteer) and
+> based on
+> [this python wrapper](https://github.com/mukulhase/WebWhatsapp-Wrapper)
 >
-> By deafult sulla will try to use Google Chrome driver if installed, if not, it will use integrated Chromium instance
+> By deafult sulla will try to use Google Chrome driver if installed, if not, it
+> will use integrated Chromium instance
 
 ## Installation
 
@@ -30,10 +35,10 @@
 // import { create, Whatsapp } from 'sulla';
 const sulla = require('sulla');
 
-sulla.create().then((client) => start(client));
+sulla.create().then(client => start(client));
 
 function start(client) {
-  client.onMessage((message) => {
+  client.onMessage(message => {
     if (message.body === 'Hi') {
       client.sendText(message.from, '👋 Hello from sulla!');
     }
@@ -61,13 +66,14 @@ sulla.create('support').then((supportBot) => {...});
 
 ## Exporting QR code
 
-By default QR code will appear on the terminal. If you need to pass the QR somewhere else heres how:
+By default QR code will appear on the terminal. If you need to pass the QR
+somewhere else heres how:
 
 ```javascript
 const fs = require('fs');
 
 // Second create() parameter is the QR callback
-sulla.create('session-marketing', (qrCode) => {
+sulla.create('session-marketing', qrCode => {
   exportQR(qrCode, 'marketing-qr.png');
 });
 
@@ -83,7 +89,8 @@ function exportQR(qrCode, path) {
 
 ## Basic functions (usage)
 
-Not every available function is listed, for further look, every function available can be found in [here](/src/api/layers).
+Not every available function is listed, for further look, every function
+available can be found in [here](/src/api/layers).
 
 ### Chatting
 
@@ -102,7 +109,7 @@ await client.sendImage(
 // Send @tagged message
 await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', [
   '5218113130740',
-  '5218243160777',
+  '5218243160777'
 ]);
 
 // Reply to a message
@@ -274,7 +281,7 @@ There are some tricks for a better usage of sulla.
 ```javascript
 // In case of being logged out of whatsapp web
 // Force it to keep the current session
-client.onStateChange((state) => {
+client.onStateChange(state => {
   if (state === 'UNLAUNCHED') {
     client.useHere();
   }
@@ -291,7 +298,8 @@ await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋');
 
 #### Multiple sessions
 
-If you need to run multiple sessions at once just pass a session name to `create()` method.
+If you need to run multiple sessions at once just pass a session name to
+`create()` method.
 
 ```javascript
 async () => {
@@ -303,8 +311,8 @@ async () => {
 
 #### Closing (saving) sessions
 
-Close the session properly to ensure the session is saved for the next time you log in (So it wont ask for QR scan again).
-So instead of CTRL+C,
+Close the session properly to ensure the session is saved for the next time you
+log in (So it wont ask for QR scan again). So instead of CTRL+C,
 
 ```javascript
 // Catch ctrl+C
@@ -351,11 +359,13 @@ To build the entire project just run
 
 ## Maintainers
 
-Maintainers are needed, I cannot keep with all the updates by myself. If you are interested please open a Pull Request.
+Maintainers are needed, I cannot keep with all the updates by myself. If you are
+interested please open a Pull Request.
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome. For major changes, please open an issue first to
+discuss what you would like to change.
 
 ## License
 
