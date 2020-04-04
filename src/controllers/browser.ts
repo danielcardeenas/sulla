@@ -14,6 +14,11 @@ export async function initWhatsapp(session: string) {
 }
 
 export async function injectApi(page: puppeteer.Page) {
+  page.waitForFunction(() => {
+    // @ts-ignore
+    return webpackJsonp !== undefined;
+  });
+
   await page.addScriptTag({
     path: require.resolve(path.join(__dirname, '../lib/wapi', 'wapi.js')),
   });

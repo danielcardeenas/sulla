@@ -5,7 +5,7 @@
  * @param {boolean} includeNotifications
  * @param {Function} done Optional callback
  */
-export function loadAndGetAllMessagesInChat(
+export async function loadAndGetAllMessagesInChat(
   id,
   includeMe,
   includeNotifications,

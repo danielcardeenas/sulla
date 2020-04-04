@@ -1,4 +1,5 @@
-import { AckType, Id } from '.';
+import { Id } from './id';
+import { AckType } from './enum';
 
 export interface Ack {
   id: Id;
