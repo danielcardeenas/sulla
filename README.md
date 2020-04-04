@@ -95,7 +95,7 @@ await client.sendText(chatId, '👋 Hello from sulla!');
 await client.sendImage(
   chatId,
   'path/to/img.jpg',
-  'something.jpg',
+  'image-name.jpg',
   'Caption text'
 );
 
