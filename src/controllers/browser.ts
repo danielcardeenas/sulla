@@ -1,8 +1,10 @@
 import * as ChromeLauncher from 'chrome-launcher';
 import * as path from 'path';
-import * as puppeteer from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
 import { CreateConfig } from '../config/create-config';
 import { puppeteerConfig } from '../config/puppeteer.config';
+import StealthPlugin = require('puppeteer-extra-plugin-stealth');
 
 export async function initWhatsapp(session: string, options: CreateConfig) {
   const browser = await initBrowser(session, options);
@@ -15,7 +17,7 @@ export async function initWhatsapp(session: string, options: CreateConfig) {
   return waPage;
 }
 
-export async function injectApi(page: puppeteer.Page) {
+export async function injectApi(page: Page) {
   page.waitForFunction(() => {
     // @ts-ignore
     return webpackJsonp !== undefined;
@@ -37,12 +39,18 @@ export async function injectApi(page: puppeteer.Page) {
  * Initializes browser, will try to use chrome as default
  * @param session
  */
-async function initBrowser(session: string, options: CreateConfig) {
-  let extras = {};
+async function initBrowser(
+  session: string,
+  options: CreateConfig,
+  extras = {}
+) {
   const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
   if (chromeInstalations.length) {
     extras = { ...extras, executablePath: chromeInstalations[0] };
   }
+
+  // Use stealth plugin to avoid being detected as a bot
+  puppeteer.use(StealthPlugin());
 
   const browser = await puppeteer.launch({
     // headless: true,
@@ -50,7 +58,7 @@ async function initBrowser(session: string, options: CreateConfig) {
     devtools: options.devtools,
     userDataDir: path.join(
       process.cwd(),
-      `session${session ? '-' + session : ''}`
+      `session${session && session.trim() !== '' ? '-' + session.trim() : ''}`
     ),
     args: [...puppeteerConfig.chroniumArgs],
     ...extras,
@@ -58,7 +66,7 @@ async function initBrowser(session: string, options: CreateConfig) {
   return browser;
 }
 
-async function getWhatsappPage(browser: puppeteer.Browser) {
+async function getWhatsappPage(browser: Browser) {
   const pages = await browser.pages();
   console.assert(pages.length > 0);
   return pages[0];
