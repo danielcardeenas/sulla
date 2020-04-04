@@ -205,12 +205,7 @@ export class SenderLayer extends ListenerLayer {
     caption?: string
   ) {
     const base64 = await fileToBase64(path);
-    return this.page.evaluate(
-      ({ to, base64, filename, caption }) => {
-        WAPI.sendFile(base64, to, filename, caption);
-      },
-      { to, base64, filename, caption }
-    );
+    return this.sendFileFromBase64(to, base64, filename, caption);
   }
 
   /**
@@ -227,12 +222,7 @@ export class SenderLayer extends ListenerLayer {
     caption: string
   ) {
     const base64 = await fileToBase64(path);
-    return await this.page.evaluate(
-      ({ to, base64, filename, caption }) => {
-        WAPI.sendVideoAsGif(base64, to, filename, caption);
-      },
-      { to, base64, filename, caption }
-    );
+    return this.sendVideoAsGifFromBase64(to, base64, filename, caption);
   }
 
   /**
