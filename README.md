@@ -56,21 +56,52 @@ sulla.create('sales').then((salesBot) => {...});
 // Init support whatsapp bot
 sulla.create('support').then((supportBot) => {...});
 ```
+
 <br>
 
+## Exporting QR code
+
+By default QR code will appear on the terminal. If you need to pass the QR somewhere else heres how:
+
+```javascript
+const fs = require('fs');
+
+function exportQR(qrCode, path) {
+  qrCode = qrCode.replace('data:image/png;base64,', '');
+  const imageBuffer = Buffer.from(qrCode, 'base64');
+
+  // Creates 'marketing-qr.png' file
+  fs.writeFileSync(path, imageBuffer);
+}
+
+sulla.create('session-marketing', (qrCode) => {
+  exportQR(qrCode, 'marketing-qr.png');
+});
+```
+
 ## Basic functions (usage)
-Not every available function is listed, for further look, every function available can be found in [here](/src/api/layers). 
+
+Not every available function is listed, for further look, every function available can be found in [here](/src/api/layers).
 
 ### Chatting
+
 ```javascript
 // Send basic text
 await client.sendText(chatId, '👋 Hello from sulla!');
 
 // Send image
-await client.sendImage(chatId, 'path/to/img.jpg', 'something.jpg', 'Caption text');
+await client.sendImage(
+  chatId,
+  'path/to/img.jpg',
+  'something.jpg',
+  'Caption text'
+);
 
 // Send @tagged message
-await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', ['5218113130740', '5218243160777']);
+await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', [
+  '5218113130740',
+  '5218243160777',
+]);
 
 // Reply to a message
 await client.reply(chatId, 'This is a rely!', message.id.toString());
@@ -79,7 +110,12 @@ await client.reply(chatId, 'This is a rely!', message.id.toString());
 await client.sendFile(chatId, 'path/to/file.pdf', 'cv.pdf', 'Curriculum');
 
 // Send gif
-await client.sendVideoAsGif(chatId, 'path/to/video.mp4', 'video.gif', 'Gif image file');
+await client.sendVideoAsGif(
+  chatId,
+  'path/to/video.mp4',
+  'video.gif',
+  'Gif image file'
+);
 
 // Send contact
 // contactId: 52155334634@c.us
@@ -92,7 +128,13 @@ await client.forwardMessages(chatId, [message.id.toString()], true);
 await client.sendImageAsSticker(chatId, 'path/to/image.jpg');
 
 // Send location
-await client.sendLocation(chatId, 25.6801987, -100.4060626, 'Some address, Washington DC', 'Subtitle');
+await client.sendLocation(
+  chatId,
+  25.6801987,
+  -100.4060626,
+  'Some address, Washington DC',
+  'Subtitle'
+);
 
 // Send seen ✔️✔️
 await client.sendSeen(chatId);
@@ -104,11 +146,11 @@ await client.startTyping(chatId);
 await client.stopTyping(chatId);
 
 // Set chat state (0: Typing, 1: Recording, 2: Paused)
-await client.setChatState(chatId, 0 | 1 | 2)
-
+await client.setChatState(chatId, 0 | 1 | 2);
 ```
 
 ### Group functions
+
 ```javascript
 // groupId or chatId: leaveGroup 52123123-323235@g.us
 
@@ -141,10 +183,10 @@ await client.demoteParticipant(groupId, '123123@c.us');
 
 // Get group admins
 await client.getGroupAdmins(groupId);
-
 ```
 
 ### Profile functions
+
 ```javascript
 // Set client status
 await client.setProfileStatus('On vacations! ✈️');
@@ -154,6 +196,7 @@ await client.setProfileName('Sulla bot');
 ```
 
 ### Device functions
+
 ```javascript
 // Get device info
 await client.getHostDevice();
@@ -172,6 +215,7 @@ await client.getWAVersion();
 ```
 
 ### Events
+
 ```javascript
 // Listen to messages
 client.onMessage(message => {
@@ -207,6 +251,7 @@ client.onAddedToGroup(chatEvent => {
 ```
 
 ### Other
+
 ```javascript
 // Delete chat
 await client.deleteChat(chatId);
@@ -215,13 +260,15 @@ await client.deleteChat(chatId);
 await client.clearChat(chatId);
 
 // Delete message (last parameter: delete only locally)
-await client.deleteMessage(chatId, message.id.toString(), false)
+await client.deleteMessage(chatId, message.id.toString(), false);
 ```
 
 ## Misc
+
 There are some tricks for a better usage of sulla.
 
 #### Keep session alive:
+
 ```javascript
 // In case of being logged out of whatsapp web
 // Force it to keep the current session
@@ -233,24 +280,30 @@ client.onStateChange((state) => {
 ```
 
 #### Send message to new contacts (non-added)
+
 Also see [Whatsapp links](https://faq.whatsapp.com/en/26000030/)
+
 ```javascript
-await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋')
+await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋');
 ```
 
 #### Multiple sessions
+
 If you need to run multiple sessions at once just pass a session name to `create()` method.
+
 ```javascript
 async () => {
   const marketingClient = await sulla.create('marketing');
   const salesClient = await sulla.create('sales');
   const supportClient = await sulla.create('support');
-} 
+};
 ```
 
 #### Closing (saving) sessions
+
 Close the session properly to ensure the session is saved for the next time you log in (So it wont ask for QR scan again).
 So instead of CTRL+C,
+
 ```javascript
 // Catch ctrl+C
 process.on('SIGINT', function() {
@@ -266,30 +319,40 @@ try {
 ```
 
 ## Development
+
 Building sulla is really simple altough it contians 3 main projects inside
-1. Wapi project 
+
+1. Wapi project
+
 ```bash
 > npm run build:wapi
 ```
+
 2. Middleeware
+
 ```bash
 > npm run build:build:middleware
 > npm run build:jsQR
 ```
+
 3. Sulla
+
 ```bash
 > npm run build:sulla
 ```
 
 To build the entire project just run
+
 ```bash
 > npm run build
 ```
 
 ## Maintainers
+
 Maintainers are needed, I cannot keep with all the updates by myself. If you are interested please open a Pull Request.
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
