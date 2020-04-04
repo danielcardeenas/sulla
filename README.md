@@ -237,6 +237,33 @@ client.onStateChange((state) => {
 await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋')
 ```
 
+#### Multiple sessions
+If you need to run multiple sessions at once just pass a session name to `create()` method.
+```javascript
+async () => {
+  const marketingClient = await sulla.create('marketing');
+  const salesClient = await sulla.create('sales');
+  const supportClient = await sulla.create('support');
+} 
+```
+
+#### Closing (saving) sessions
+Close the session properly to ensure the session is saved for the next time you log in (So it wont ask for QR scan again).
+So instead of CTRL+C,
+```javascript
+// Catch ctrl+C
+process.on('SIGINT', function() {
+  client.close();
+});
+
+// Try-catch close
+try {
+   ...
+} catch (error) {
+   client.close();
+}
+```
+
 ## Maintainers
 Maintainers are needed, I cannot keep with all the updates by myself. If you are interested please open a Pull Request.
 
