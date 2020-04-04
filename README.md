@@ -21,7 +21,7 @@
 > npm i sulla
 ```
 
-## Usage
+## Getting started
 
 ```javascript
 // import { create, Whatsapp } from 'sulla';
@@ -40,17 +40,18 @@ function start(client) {
 
 <img align="left" src="https://github.com/danielcardeenas/sulla/blob/master/img/auth.gif?raw=true" height="300">
 
-- After executing `create()` function, **sulla** will create an instance of whatsapp web. If you are not logged in, it will print a QR code in the terminal. Scan it with your phone and you are ready to go!
+##### After executing `create()` function, **sulla** will create an instance of whatsapp web. If you are not logged in, it will print a QR code in the terminal. Scan it with your phone and you are ready to go!
 
-- Sulla will remember the session so there is no need to authenticate everytime.
+##### Sulla will remember the session so there is no need to authenticate everytime.
 
-- Multiples sessions can be created at the same time by pasing a session name to `create()` function:
+##### Multiples sessions can be created at the same time by pasing a session name to `create()` function:
 ```javascript
 sulla.create().then((client) => start(client));
 sulla.create('another').then((client2) => startAnother(client2));
 ```
+<br>
 
-### Functions
+## Usage
 
 | Function                          | Description | Implemented |
 | --------------------------------- | ----------- | ----------- |
