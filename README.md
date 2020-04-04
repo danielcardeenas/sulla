@@ -73,7 +73,7 @@ await client.sendImage(chatId, 'path/to/img.jpg', 'something.jpg', 'Caption text
 await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', ['5218113130740', '5218243160777']);
 
 // Reply to a message
-await client.reply(chatId, 'This is a rely!', message.id.toString());
+await client.reply(chatId, 'This is a reply!', message.id.toString());
 
 // Send file (sulla will take care of mime types, just need the path)
 await client.sendFile(chatId, 'path/to/file.pdf', 'cv.pdf', 'Curriculum');
