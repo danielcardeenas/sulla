@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/danielcardeenas/sulla">
-    <img width="30%" src="https://i.imgur.com/zJpRzmh.jpg" alt="Sulla logo">
+    <img width="30%" src="https://github.com/danielcardeenas/sulla/blob/master/img/logo.jpg?raw=true" alt="Sulla logo">
   </a>
 </p>
 
@@ -38,11 +38,19 @@ function start(client) {
 }
 ```
 
-###### After executing `create()` function, **sulla** will create an instance of whatsapp web. If you are not logged in, it will print a QR code in the [terminal](https://i.imgur.com/g8QvERI.png). Scan it with your phone and you are ready to go!
+<img align="left" src="https://github.com/danielcardeenas/sulla/blob/master/img/auth.gif?raw=true" height="300">
 
-###### sulla will remember the session so there is no need to authenticate everytime.
+- After executing `create()` function, **sulla** will create an instance of whatsapp web. If you are not logged in, it will print a QR code in the terminal. Scan it with your phone and you are ready to go!
 
-### Functions list
+- Sulla will remember the session so there is no need to authenticate everytime.
+
+- Multiples sessions can be created at the same time by pasing a session name to `create()` function:
+```javascript
+sulla.create().then((client) => start(client));
+sulla.create('another').then((client2) => startAnother(client2));
+```
+
+### Functions
 
 | Function                          | Description | Implemented |
 | --------------------------------- | ----------- | ----------- |
