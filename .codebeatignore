@@ -1,2 +1,2 @@
-src/lib/jsQr
-src/lib/wapi/jssha
+src/lib/jsQR/jsQR.js
+src/lib/wapi/jssha/index.js
