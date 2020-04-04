@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/danielcardeenas/sulla">
-    <img width="30%" src="https://github.com/danielcardeenas/sulla/blob/master/img/logo.jpg?raw=true" alt="Sulla logo">
+    <img width="250px" src="https://github.com/danielcardeenas/sulla/blob/master/img/logo.jpg?raw=true" alt="Sulla logo">
   </a>
 </p>
 
@@ -41,7 +41,7 @@ function start(client) {
 }
 ```
 
-<img align="left" src="https://github.com/danielcardeenas/sulla/blob/master/img/auth.gif?raw=true" width="40%">
+<img align="left" src="https://github.com/danielcardeenas/sulla/blob/master/img/auth.gif?raw=true" height="320px">
 
 ##### After executing `create()` function, **sulla** will create an instance of whatsapp web. If you are not logged in, it will print a QR code in the terminal. Scan it with your phone and you are ready to go!
 
