@@ -1,6 +1,7 @@
 node_modules
 dist
 session
+session-*
 assets
 app.js
 gohan.jpg
