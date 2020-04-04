@@ -233,6 +233,7 @@ client.onStateChange((state) => {
 ```
 
 #### Send message to new contacts (non-added)
+Also see [Whatsapp links](https://faq.whatsapp.com/en/26000030/)
 ```javascript
 await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋')
 ```
