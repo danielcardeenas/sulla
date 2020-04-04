@@ -3,9 +3,14 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/danielcardeenas/sulla)
 [![GitHub license](https://img.shields.io/github/license/danielcardeenas/sulla)](https://github.com/danielcardeenas/sulla/blob/master/LICENSE)
 
-# Maintainers needed, please open a PR if interested
+<p align="center">
+  <a href="https://sulu.io/" target="_blank">
+    <img width="30%" src="https://i.imgur.com/zJpRzmh.jpg" alt="Sulu logo">
+  </a>
+</p>
 
-# sulla
+<p align="center">
+</p>
 
 > Sulla is a javascript library which provides a high-level API control to Whatsapp so it can be configured to automatize resposes or any data that goes trough Whatsapp effortlessly.
 >
