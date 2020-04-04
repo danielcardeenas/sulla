@@ -54,26 +54,13 @@ sulla.create('sales').then((salesBot) => {...});
 sulla.create('support').then((supportBot) => {...});
 ```
 <br>
-<br>
 
 ## Usage
 
-| Function                          | Description | Implemented |
-| --------------------------------- | ----------- | ----------- |
-| Receive message                   |             | ✅          |
-| Send text                         |             | ✅          |
-| Get contacts                      |             | ✅          |
-| Get chats                         |             | ✅          |
-| Get groups                        |             | ✅          |
-| Get group members                 |             | ✅          |
-| Send contact                      |             | ✅          |
-| Get contact detail                |             | ✅          |
-| Send media (image, audio, doc)    |             | ✅          |
-| Send stickers                     |             | ✅          |
-| Decrypt media (image, audio, doc) |             | ✅          |
 
 ## Contributing
 
+Maintainers are needed. Please open a PR if interested
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
