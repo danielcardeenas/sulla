@@ -1,4 +1,5 @@
 import {
+  _getGroupParticipants,
   addParticipant,
   areAllMessagesLoaded,
   asyncLoadAllEarlierMessages,
@@ -76,9 +77,8 @@ import {
   startTyping,
   stopTyping,
   unblockContact,
-  _getGroupParticipants,
 } from './functions';
-import { base64ToFile, generateMediaKey, getFileHash } from './helper';
+import {base64ToFile, generateMediaKey, getFileHash} from './helper';
 import {
   addNewMessagesListener,
   addOnAddedToGroup,
@@ -97,25 +97,25 @@ import {
   _serializeProfilePicThumb,
   _serializeRawObj,
 } from './serializers';
-import { getStore } from './store/get-store';
+import {getStore} from './store/get-store';
 
 if (!window.Store || !window.Store.Msg) {
-  (function () {
+  (function() {
     const parasite = `parasite${Date.now()}`;
     // webpackJsonp([], { [parasite]: (x, y, z) => getStore(z) }, [parasite]);
     if (typeof webpackJsonp === 'function')
-      webpackJsonp([], { [parasite]: (x, y, z) => getStore(z) }, [parasite]);
+      webpackJsonp([], {[parasite] : (x, y, z) => getStore(z)}, [ parasite ]);
     else
       webpackJsonp.push([
-        [parasite],
-        { [parasite]: (x, y, z) => getStore(z) },
-        [[parasite]],
+        [ parasite ],
+        {[parasite] : (x, y, z) => getStore(z)},
+        [ [ parasite ] ],
       ]);
   })();
 }
 
 window.WAPI = {
-  lastRead: {},
+  lastRead : {},
 };
 
 // Serializers assignations
@@ -219,9 +219,9 @@ window.WAPI.base64ToFile = base64ToFile;
 // Listeners initialization
 window.WAPI._newMessagesQueue = [];
 window.WAPI._newMessagesBuffer =
-  sessionStorage.getItem('saved_msgs') != null
-    ? JSON.parse(sessionStorage.getItem('saved_msgs'))
-    : [];
+    sessionStorage.getItem('saved_msgs') != null
+        ? JSON.parse(sessionStorage.getItem('saved_msgs'))
+        : [];
 window.WAPI._newMessagesDebouncer = null;
 window.WAPI._newMessagesCallbacks = [];
 window.Store.Msg.off('add');
@@ -245,65 +245,53 @@ addOnAddedToGroup();
 /**
  * New version of @tag message
  */
-window.WAPI.sendMessageMentioned = async function (chatId, message, mentioned) {
+window.WAPI.sendMessageMentioned = async function(chatId, message, mentioned) {
   if (!Array.isArray(mentioned)) {
-    mentioned = [mentioned];
+    mentioned = [ mentioned ];
   }
 
   const chat = WAPI.getChat(chatId);
-  const users = await Store.Contact.serialize().filter((x) =>
-    mentioned.includes(x.id.user)
-  );
+  const users = await Store.Contact.serialize().filter(
+      (x) => mentioned.includes(x.id.user));
 
   chat.sendMessage(message, {
-    linkPreview: null,
-    mentionedJidList: users.map((u) => u.id),
-    quotedMsg: null,
-    quotedMsgAdminGroupJid: null,
+    linkPreview : null,
+    mentionedJidList : users.map((u) => u.id),
+    quotedMsg : null,
+    quotedMsgAdminGroupJid : null,
   });
 };
 
-window.WAPI.getProfilePicSmallFromId = function (id, done) {
+window.WAPI.getProfilePicSmallFromId = function(id, done) {
   window.Store.ProfilePicThumb.find(id).then(
-    function (d) {
-      if (d.img !== undefined) {
-        window.WAPI.downloadFileWithCredentials(d.img, done);
-      } else {
-        done(false);
-      }
-    },
-    function (e) {
-      done(false);
-    }
-  );
+      function(d) {
+        if (d.img !== undefined) {
+          window.WAPI.downloadFileWithCredentials(d.img, done);
+        } else {
+          done(false);
+        }
+      },
+      function(e) { done(false); });
 };
 
-window.WAPI.getProfilePicFromId = function (id, done) {
+window.WAPI.getProfilePicFromId = function(id, done) {
   window.Store.ProfilePicThumb.find(id).then(
-    function (d) {
-      if (d.imgFull !== undefined) {
-        window.WAPI.downloadFileWithCredentials(d.imgFull, done);
-      } else {
-        done(false);
-      }
-    },
-    function (e) {
-      done(false);
-    }
-  );
+      function(d) {
+        if (d.imgFull !== undefined) {
+          window.WAPI.downloadFileWithCredentials(d.imgFull, done);
+        } else {
+          done(false);
+        }
+      },
+      function(e) { done(false); });
 };
 
-window.WAPI.getGeneratedUserAgent = function (useragent) {
-  if (!useragent.includes('WhatsApp')) return 'WhatsApp/0.4.315 ' + useragent;
+window.WAPI.getGeneratedUserAgent = function(useragent) {
+  if (!useragent.includes('WhatsApp'))
+    return 'WhatsApp/0.4.315 ' + useragent;
   return useragent.replace(
-    useragent
-      .match(/WhatsApp\/([.\d])*/g)[0]
-      .match(/[.\d]*/g)
-      .find((x) => x),
-    window.Debug.VERSION
-  );
+      useragent.match(/WhatsApp\/([.\d])*/g)[0].match(/[.\d]*/g).find((x) => x),
+      window.Debug.VERSION);
 };
 
-window.WAPI.getWAVersion = function () {
-  return window.Debug.VERSION;
-};
+window.WAPI.getWAVersion = function() { return window.Debug.VERSION; };
