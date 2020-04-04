@@ -1,4 +1,7 @@
 [![npm version](https://img.shields.io/npm/v/sulla.svg?color=%2378e08f)](https://www.npmjs.com/package/sulla)
+![npm type definitions](https://img.shields.io/npm/types/sulla)
+![GitHub last commit](https://img.shields.io/github/last-commit/danielcardeenas/sulla)
+[![GitHub license](https://img.shields.io/github/license/danielcardeenas/sulla)](https://github.com/danielcardeenas/sulla/blob/master/LICENSE)
 
 # Maintainers needed, please open a PR if interested
 
