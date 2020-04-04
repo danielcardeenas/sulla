@@ -4,6 +4,8 @@
   </a>
 </p>
 
+# Sulla
+
 [![npm version](https://img.shields.io/npm/v/sulla.svg?color=%2378e08f)](https://www.npmjs.com/package/sulla)
 ![npm type definitions](https://img.shields.io/npm/types/sulla)
 ![GitHub last commit](https://img.shields.io/github/last-commit/danielcardeenas/sulla)
@@ -59,7 +61,7 @@ sulla.create('support').then((supportBot) => {...});
 ## Basic functions (usage)
 Not every available function is listed, for further look, every function available can be found in [here](/src/api/layers). 
 
-#### Chatting
+### Chatting
 ```javascript
 // Send basic text
 await client.sendText(chatId, '👋 Hello from sulla!');
@@ -169,7 +171,7 @@ await client.isConnected();
 await client.getWAVersion();
 ```
 
-#### Events
+### Events
 ```javascript
 // Listen to messages
 client.onMessage(message => {
