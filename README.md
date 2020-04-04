@@ -18,10 +18,10 @@
 // import { create, Whatsapp } from 'sulla';
 const sulla = require('sulla');
 
-sulla.create().then(client => start(client));
+sulla.create().then((client) => start(client));
 
 function start(client) {
-  client.onMessage(message => {
+  client.onMessage((message) => {
     if (message.body === 'Hi') {
       client.sendText(message.from, '👋 Hello from sulla!');
     }
@@ -45,9 +45,9 @@ function start(client) {
 | Get group members                 |             | ✅          |
 | Send contact                      |             | ✅          |
 | Get contact detail                |             | ✅          |
-| Send media (image, audio, doc)    |             |             |
-| Send stickers                     |             |             |
-| Decrypt media (image, audio, doc) |             |             |
+| Send media (image, audio, doc)    |             | ✅          |
+| Send stickers                     |             | ✅          |
+| Decrypt media (image, audio, doc) |             | ✅          |
 
 ## Contributing
 
