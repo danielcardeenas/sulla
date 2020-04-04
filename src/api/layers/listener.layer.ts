@@ -2,7 +2,6 @@ import { Page } from 'puppeteer';
 import { ExposedFn } from '../helpers/exposed.enum';
 import { Ack, Chat, LiveLocation, Message, ParticipantEvent } from '../model';
 import { SocketState } from '../model/enum';
-import { HostLayer } from './host.layer';
 import { ProfileLayer } from './profile.layer';
 
 declare module WAPI {

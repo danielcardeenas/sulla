@@ -242,7 +242,6 @@ export class RetrieverLayer extends SenderLayer {
    * @param includeNotifications
    * @returns any
    */
-
   public async getAllMessagesInChat(
     chatId: string,
     includeMe: boolean,
@@ -262,7 +261,6 @@ export class RetrieverLayer extends SenderLayer {
    * @param includeNotifications
    * @returns any
    */
-
   public async loadAndGetAllMessagesInChat(
     chatId: string,
     includeMe: boolean,
