@@ -2,6 +2,7 @@ import { Page } from 'puppeteer';
 import * as sharp from 'sharp';
 import { base64MimeType, fileToBase64 } from '../helpers';
 import { Message } from '../model';
+import { ChatState } from '../model/enum';
 import { ListenerLayer } from './listener.layer';
 
 declare module WAPI {
@@ -15,7 +16,6 @@ declare module WAPI {
     filename: string,
     caption: string
   ) => any;
-  const sendMessageWithTags: (to: string, content: string) => string;
   const sendMessageWithThumb: (
     thumb: string,
     url: string,
@@ -59,6 +59,7 @@ declare module WAPI {
   ) => void;
   const sendMessageMentioned: (...args: any) => any;
   const sendMessageToID: (id: string, message: string) => any;
+  const setChatState: (chatState: string, chatId: string) => void;
 }
 
 export class SenderLayer extends ListenerLayer {
@@ -116,24 +117,6 @@ export class SenderLayer extends ListenerLayer {
         WAPI.sendImage(data, to, filename, caption);
       },
       { to, data, filename, caption }
-    );
-  }
-  /**
-   * Sends text message with @tags mentions
-   *
-   * Example:
-   * "Hello @8114285934 from sulla!"
-   * @param to chat id
-   * @param content message body
-   * @returns message id
-   */
-  public sendTextWithTags(to: string, content: string): Promise<string> {
-    return this.page.evaluate(
-      ({ to, content }) => {
-        WAPI.sendSeen(to);
-        return WAPI.sendMessageWithTags(to, content);
-      },
-      { to, content }
     );
   }
 
@@ -299,12 +282,12 @@ export class SenderLayer extends ListenerLayer {
   }
 
   /**
-   * This function takes an image and sends it as a sticker to the recipient. This is helpful for sending semi-ephemeral things like QR codes.
-   * The advantage is that it will not show up in the recipients gallery. This function automatiicaly converts images to the required webp format.
-   * @param b64: This is the base64 string formatted with data URI. You can also send a plain base64 string but it may result in an error as the function will not be able to determine the filetype before sending.
-   * @param to: The recipient id.
+   * Generates sticker from given image and sends it
+   * @param path image path
+   * @param to
    */
-  public async sendImageAsSticker(b64: string, to: string) {
+  public async sendImageAsSticker(to: string, path: string) {
+    const b64 = await fileToBase64(path);
     const buff = Buffer.from(
       b64.replace(/^data:image\/(png|gif|jpeg);base64,/, ''),
       'base64'
@@ -383,15 +366,29 @@ export class SenderLayer extends ListenerLayer {
   }
 
   /**
-   * New version for sendign @tagged messages
+   * Sends text with tags
+   *
    */
-  // public async sendMentioned(to: string, message: string, mentioned: string) {
-  //   console.log(message, mentioned);
-  //   return await this.page.evaluate(
-  //     ({ to, message, mentioned }) => {
-  //       WAPI.sendMessageMentioned(to, message, mentioned);
-  //     },
-  //     { to, message, mentioned }
-  //   );
-  // }
+  public async sendMentioned(to: string, message: string, mentioned: string[]) {
+    return await this.page.evaluate(
+      ({ to, message, mentioned }) => {
+        WAPI.sendMessageMentioned(to, message, mentioned);
+      },
+      { to, message, mentioned }
+    );
+  }
+
+  /**
+   * Sets the chat state
+   * @param chatState
+   * @param chatId
+   */
+  public async setChatState(chatId: string, chatState: ChatState) {
+    return await this.page.evaluate(
+      ({ chatState, chatId }) => {
+        WAPI.setChatState(chatState, chatId);
+      },
+      { chatState: chatState, chatId }
+    );
+  }
 }

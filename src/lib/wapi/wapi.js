@@ -240,14 +240,18 @@ addOnAddedToGroup();
  * New version of @tag message
  */
 window.WAPI.sendMessageMentioned = async function (chatId, message, mentioned) {
-  var chat = WAPI.getChat(chatId);
-  const user = await Store.Contact.serialize().find(
-    (x) => x.id.user === mentioned
+  if (!Array.isArray(mentioned)) {
+    mentioned = [mentioned];
+  }
+
+  const chat = WAPI.getChat(chatId);
+  const users = await Store.Contact.serialize().filter((x) =>
+    mentioned.includes(x.id.user)
   );
-  console.log(user);
+
   chat.sendMessage(message, {
     linkPreview: null,
-    mentionedJidList: [user.id],
+    mentionedJidList: users.map((u) => u.id),
     quotedMsg: null,
     quotedMsgAdminGroupJid: null,
   });

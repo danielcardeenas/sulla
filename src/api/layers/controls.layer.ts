@@ -42,7 +42,6 @@ export class ControlsLayer extends GroupLayer {
    * @param chatId The chat id from which to delete the message.
    * @param messageId The specific message id of the message to be deleted
    * @param onlyLocal If it should only delete locally (message remains on the other recipienct's phone). Defaults to false.
-   * @returns nothing
    */
   public async deleteMessage(
     chatId: string,
