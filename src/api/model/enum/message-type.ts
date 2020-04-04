@@ -1,4 +1,4 @@
-export enum MessageTypes {
+export enum MessageType {
   TEXT = 'chat',
   AUDIO = 'audio',
   VOICE = 'ptt',

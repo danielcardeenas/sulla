@@ -1,8 +1,8 @@
 import * as ora from 'ora';
 import { Whatsapp } from '../api/whatsapp';
+import { CreateConfig } from '../config/create-config';
 import { isAuthenticated, isInsideChat, retrieveQR } from './auth';
 import { initWhatsapp, injectApi } from './browser';
-import { CreateConfig } from '../config/create-config';
 const spinner = ora();
 
 /**
