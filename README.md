@@ -4,8 +4,6 @@
   </a>
 </p>
 
-# Sulla
-
 [![npm version](https://img.shields.io/npm/v/sulla.svg?color=%2378e08f)](https://www.npmjs.com/package/sulla)
 ![npm type definitions](https://img.shields.io/npm/types/sulla)
 ![GitHub last commit](https://img.shields.io/github/last-commit/danielcardeenas/sulla)
