@@ -26,6 +26,7 @@
 ## Getting started
 
 ```javascript
+// Supports ES6
 // import { create, Whatsapp } from 'sulla';
 const sulla = require('sulla');
 
@@ -58,7 +59,86 @@ sulla.create('support').then((supportBot) => {...});
 <br>
 
 ## Usage
+For further look, every function available can be found in [here](/src/api/layers). 
 
+#### Sending
+```javascript
+// Send basic text
+await client.sendText(chatId, '👋 Hello from sulla!');
+
+// Send image
+await client.sendImage(chatId, 'path/to/img.jpg', 'something.jpg', 'Caption text');
+
+// Send @tagged message
+await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', ['5218113130740', '5218243160777']);
+
+// Reply to a message
+await client.reply(chatId, 'This is a rely!', message.id.toString());
+
+// Send file (sulla will take care of mime types, just need the path)
+await client.sendFile(chatId, 'path/to/file.pdf', 'cv.pdf', 'Curriculum');
+
+// Send gif
+await client.sendVideoAsGif(chatId, 'path/to/video.mp4', 'video.gif', 'Gif image file');
+
+// Send contact
+// contactId: 52155334634@c.us
+await client.sendContact(chatId, contactId);
+
+// Forwards messages
+await client.forwardMessages(chatId, [message.id.toString()], true);
+
+// Send sticker
+await client.sendImageAsSticker(chatId, 'path/to/image.jpg');
+
+// Send location
+await client.sendLocation(chatId, 25.6801987, -100.4060626, 'Some address, Washington DC', 'Subtitle');
+
+// Send seen ✔️✔️
+await client.sendSeen(chatId);
+
+// Start typing...
+await client.startTyping(chatId);
+
+// Stop typing
+await client.stopTyping(chatId);
+
+```
+
+#### Events
+```javascript
+// Listen to messages
+client.onMessage(message => {
+  ...
+})
+
+// Listen to state changes
+client.onStateChange(state => {
+  ...
+});
+
+// Listen to ack's
+client.onAck(ack => {
+  ...
+});
+
+// Listen to live location
+// chatId: 'phone@c.us'
+client.onLiveLocation(chatId, (liveLocation) => {
+  ...
+});
+
+// Listen to group participant changes
+client.onParticipantsChanged(chatId, (participantChange) => {
+  ...
+});
+
+// Listen when client has been added to a group
+client.onAddedToGroup(chatEvent => {
+  ...
+});
+
+```
 
 ## Maintainers
 Maintainers are needed, I cannot keep with all the updates by myself. If you are interested please open a Pull Request.
