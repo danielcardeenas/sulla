@@ -1,12 +1,13 @@
 import { Page } from 'puppeteer';
 import * as sharp from 'sharp';
 import { base64MimeType, fileToBase64 } from '../helpers';
-import { Message } from '../model';
+import { Chat, Message } from '../model';
 import { ChatState } from '../model/enum';
 import { ListenerLayer } from './listener.layer';
 
 declare module WAPI {
   const sendSeen: (to: string) => void;
+  const getChat: (contactId: string) => Chat;
   const startTyping: (to: string) => void;
   const stopTyping: (to: string) => void;
   const sendMessage: (to: string, content: string) => string;
@@ -76,7 +77,11 @@ export class SenderLayer extends ListenerLayer {
     return this.page.evaluate(
       ({ to, content }) => {
         WAPI.sendSeen(to);
-        return WAPI.sendMessage(to, content);
+        if (!WAPI.getChat(to)) {
+          return WAPI.sendMessageToID(to, content);
+        } else {
+          return WAPI.sendMessage(to, content);
+        }
       },
       { to, content }
     );
