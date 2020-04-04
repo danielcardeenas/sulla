@@ -45,10 +45,15 @@ function start(client) {
 ##### Sulla will remember the session so there is no need to authenticate everytime.
 
 ##### Multiples sessions can be created at the same time by pasing a session name to `create()` function:
+
 ```javascript
-sulla.create().then((client) => start(client));
-sulla.create('another').then((client2) => startAnother(client2));
+// Init sales whatsapp bot
+sulla.create('sales').then((salesBot) => {...});
+
+// Init support whatsapp bot
+sulla.create('support').then((supportBot) => {...});
 ```
+<br>
 <br>
 
 ## Usage
