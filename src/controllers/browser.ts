@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as puppeteer from 'puppeteer';
+import * as ChromeLauncher from 'chrome-launcher';
 import { puppeteerConfig } from '../config/puppeteer.config';
 
 export async function initWhatsapp(session: string) {
@@ -31,7 +32,17 @@ export async function injectApi(page: puppeteer.Page) {
   return page;
 }
 
+/**
+ * Initializes browser, will try to use chrome as default
+ * @param session
+ */
 async function initBrowser(session: string) {
+  let extras = {};
+  const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
+  if (chromeInstalations.length) {
+    extras = { ...extras, executablePath: chromeInstalations[0] };
+  }
+
   const browser = await puppeteer.launch({
     // headless: true,
     headless: false,
@@ -41,6 +52,7 @@ async function initBrowser(session: string) {
       `session${session ? '-' + session : ''}`
     ),
     args: [...puppeteerConfig.chroniumArgs],
+    ...extras,
   });
   return browser;
 }

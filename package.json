@@ -55,6 +55,7 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
+    "chrome-launcher": "^0.13.1",
     "file-type": "^14.1.4",
     "ora": "^4.0.3",
     "puppeteer": "^2.1.1",
