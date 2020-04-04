@@ -46,7 +46,7 @@ function start(client) {
 }
 ```
 
-<img align="left" src="https://github.com/danielcardeenas/sulla/blob/master/img/auth.gif?raw=true" height="320px">
+<img align="left" src="https://github.com/danielcardeenas/sulla/blob/master/img/auth.gif?raw=true" width="370px">
 
 ##### After executing `create()` function, **sulla** will create an instance of whatsapp web. If you are not logged in, it will print a QR code in the terminal. Scan it with your phone and you are ready to go!
 
@@ -113,7 +113,7 @@ await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', [
 ]);
 
 // Reply to a message
-await client.reply(chatId, 'This is a rely!', message.id.toString());
+await client.reply(chatId, 'This is a reply!', message.id.toString());
 
 // Send file (sulla will take care of mime types, just need the path)
 await client.sendFile(chatId, 'path/to/file.pdf', 'cv.pdf', 'Curriculum');
