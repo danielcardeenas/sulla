@@ -66,6 +66,12 @@ By default QR code will appear on the terminal. If you need to pass the QR somew
 ```javascript
 const fs = require('fs');
 
+// Second create() is the QR callback
+sulla.create('session-marketing', (qrCode) => {
+  exportQR(qrCode, 'marketing-qr.png');
+});
+
+// Writes QR in specified path
 function exportQR(qrCode, path) {
   qrCode = qrCode.replace('data:image/png;base64,', '');
   const imageBuffer = Buffer.from(qrCode, 'base64');
@@ -73,10 +79,6 @@ function exportQR(qrCode, path) {
   // Creates 'marketing-qr.png' file
   fs.writeFileSync(path, imageBuffer);
 }
-
-sulla.create('session-marketing', (qrCode) => {
-  exportQR(qrCode, 'marketing-qr.png');
-});
 ```
 
 ## Basic functions (usage)
