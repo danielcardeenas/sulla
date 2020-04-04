@@ -1,8 +1,8 @@
 /**
  * Serializes number status object
- * @param {*} obj 
+ * @param {*} obj
  */
-export const _serializeNumberStatusObj = obj => {
+export const _serializeNumberStatusObj = (obj) => {
   if (obj == undefined) {
     return null;
   }
@@ -13,7 +13,7 @@ export const _serializeNumberStatusObj = obj => {
       id: obj.jid,
       status: obj.status,
       isBusiness: obj.biz === true,
-      canReceiveMessage: obj.status === 200
+      canReceiveMessage: obj.status === 200,
     }
   );
 };

@@ -3,7 +3,7 @@ export function sendMessage2(id, message, done) {
   if (chat !== undefined) {
     try {
       if (done !== undefined) {
-        chat.sendMessage(message).then(function() {
+        chat.sendMessage(message).then(function () {
           done(true);
         });
       } else {

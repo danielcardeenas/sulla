@@ -1,13 +1,20 @@
+import { AckType } from './enum/ack-type';
+
 export interface Message {
   id: string;
   body: string;
   type: string;
+  mimetype?: string;
+  lat?: string;
+  lng?: string;
+  loc?: string;
   t: number;
   notifyName: string;
   from: string;
   to: string;
   self: string;
-  ack: number;
+  duration?: string | number;
+  ack: AckType;
   invis: boolean;
   isNewMsg: boolean;
   star: boolean;
@@ -15,6 +22,7 @@ export interface Message {
   broadcast: boolean;
   isForwarded: boolean;
   labels: any[];
+  caption: string;
   sender: {
     id: string;
     name: string;
@@ -94,6 +102,7 @@ export interface Message {
     presence: { id: string; chatstates: any[] };
   };
   chatId: string;
+  quotedMsg: any;
   quotedMsgObj: any;
   mediaData: {};
 }

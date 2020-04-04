@@ -1,8 +1,8 @@
 /**
  * Serializes profile pic (thumbnail) object
- * @param {*} obj 
+ * @param {*} obj
  */
-export const _serializeProfilePicThumb = obj => {
+export const _serializeProfilePicThumb = (obj) => {
   if (obj == undefined) {
     return null;
   }
@@ -15,7 +15,7 @@ export const _serializeProfilePicThumb = obj => {
       img: obj.img,
       imgFull: obj.imgFull,
       raw: obj.raw,
-      tag: obj.tag
+      tag: obj.tag,
     }
   );
 };
