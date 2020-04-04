@@ -58,6 +58,7 @@ declare module WAPI {
     caption: string
   ) => void;
   const sendMessageMentioned: (...args: any) => any;
+  const sendMessageToID: (id: string, message: string) => any;
 }
 
 export class SenderLayer extends ListenerLayer {
@@ -75,6 +76,22 @@ export class SenderLayer extends ListenerLayer {
       ({ to, content }) => {
         WAPI.sendSeen(to);
         return WAPI.sendMessage(to, content);
+      },
+      { to, content }
+    );
+  }
+
+  /**
+   * Experimental!
+   * Sends a text message to given chat even if its a non-existent chat
+   * @param to chat id: xxxxx@us.c
+   * @param content text message
+   */
+  public async sendMessageToId(to: string, content: string): Promise<string> {
+    return this.page.evaluate(
+      ({ to, content }) => {
+        WAPI.sendSeen(to);
+        return WAPI.sendMessageToID(to, content);
       },
       { to, content }
     );

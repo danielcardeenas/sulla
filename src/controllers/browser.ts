@@ -1,10 +1,11 @@
+import * as ChromeLauncher from 'chrome-launcher';
 import * as path from 'path';
 import * as puppeteer from 'puppeteer';
-import * as ChromeLauncher from 'chrome-launcher';
+import { CreateConfig } from '../config/create-config';
 import { puppeteerConfig } from '../config/puppeteer.config';
 
-export async function initWhatsapp(session: string) {
-  const browser = await initBrowser(session);
+export async function initWhatsapp(session: string, options: CreateConfig) {
+  const browser = await initBrowser(session, options);
   const waPage = await getWhatsappPage(browser);
   await waPage.setUserAgent(
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'
@@ -36,7 +37,7 @@ export async function injectApi(page: puppeteer.Page) {
  * Initializes browser, will try to use chrome as default
  * @param session
  */
-async function initBrowser(session: string) {
+async function initBrowser(session: string, options: CreateConfig) {
   let extras = {};
   const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
   if (chromeInstalations.length) {
@@ -45,8 +46,8 @@ async function initBrowser(session: string) {
 
   const browser = await puppeteer.launch({
     // headless: true,
-    headless: false,
-    devtools: false,
+    headless: options.headless,
+    devtools: options.devtools,
     userDataDir: path.join(
       process.cwd(),
       `session${session ? '-' + session : ''}`

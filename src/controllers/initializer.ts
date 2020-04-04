@@ -2,14 +2,18 @@ import * as ora from 'ora';
 import { Whatsapp } from '../api/whatsapp';
 import { isAuthenticated, isInsideChat, retrieveQR } from './auth';
 import { initWhatsapp, injectApi } from './browser';
+import { CreateConfig } from '../config/create-config';
 const spinner = ora();
 
 /**
  * Should be called to initialize whatsapp client
  */
-export async function create(session?: string) {
+export async function create(
+  session?: string,
+  options: CreateConfig = { headless: true, devtools: false }
+) {
   spinner.start('Initializing whatsapp');
-  let waPage = await initWhatsapp(session);
+  let waPage = await initWhatsapp(session, options);
   spinner.succeed();
 
   spinner.start('Authenticating');
