@@ -264,11 +264,31 @@ try {
 }
 ```
 
+## Development
+Building sulla is really simple altough it contians 3 main projects inside
+1. Wapi project 
+```bash
+> npm run build:wapi
+```
+2. Middleeware
+```bash
+> npm run build:build:middleware
+> npm run build:jsQR
+```
+3. Sulla
+```bash
+> npm run build:sulla
+```
+
+To build the entire project just run
+```bash
+> npm run build
+```
+
 ## Maintainers
 Maintainers are needed, I cannot keep with all the updates by myself. If you are interested please open a Pull Request.
 
 ## Contributing
-
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
