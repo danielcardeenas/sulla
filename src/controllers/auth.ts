@@ -19,7 +19,7 @@ export const needsToScan = (waPage: puppeteer.Page) => {
   return from(
     waPage
       .waitForSelector('body > div > div > .landing-wrapper', {
-        timeout: 0
+        timeout: 0,
       })
       .then(() => false)
   );
@@ -35,7 +35,7 @@ export const isInsideChat = (waPage: puppeteer.Page) => {
         !!document.getElementsByClassName('app')[0].attributes.tabindex
         `,
         {
-          timeout: 0
+          timeout: 0,
         }
       )
       .then(() => true)
@@ -43,20 +43,22 @@ export const isInsideChat = (waPage: puppeteer.Page) => {
 };
 
 export async function retrieveQR(page: puppeteer.Page) {
-  const code = await decodeQR(page);
+  const { code, data } = await decodeQR(page);
   qrcode.generate(code, {
-    small: true
+    small: true,
   });
 
-  return true;
+  return { code, data };
 }
 
-async function decodeQR(page: puppeteer.Page): Promise<string> {
+async function decodeQR(
+  page: puppeteer.Page
+): Promise<{ code: string; data: string }> {
   await page.waitForSelector('canvas', { timeout: 0 });
   await page.addScriptTag({
-    path: require.resolve(path.join(__dirname, '../lib/jsQR', 'jsQR.js'))
+    path: require.resolve(path.join(__dirname, '../lib/jsQR', 'jsQR.js')),
   });
-  
+
   return await page.evaluate(() => {
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -68,6 +70,6 @@ async function decodeQR(page: puppeteer.Page): Promise<string> {
       canvas.height
     );
 
-    return code.data;
+    return { code: code.data, data: canvas.toDataURL() };
   });
 }

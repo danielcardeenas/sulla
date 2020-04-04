@@ -9,7 +9,8 @@ const spinner = ora();
  * Should be called to initialize whatsapp client
  */
 export async function create(
-  session?: string,
+  session = 'session',
+  catchQR?: (qrCode: string) => void,
   options: CreateConfig = { headless: true, devtools: false }
 ) {
   spinner.start('Initializing whatsapp');
@@ -24,7 +25,10 @@ export async function create(
     spinner.succeed();
   } else {
     spinner.info('Authenticate to continue');
-    await retrieveQR(waPage);
+    const { data } = await retrieveQR(waPage);
+    if (catchQR) {
+      catchQR(data);
+    }
 
     // Wait til inside chat
     await isInsideChat(waPage).toPromise();

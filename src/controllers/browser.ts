@@ -56,10 +56,7 @@ async function initBrowser(
     // headless: true,
     headless: options.headless,
     devtools: options.devtools,
-    userDataDir: path.join(
-      process.cwd(),
-      `session${session && session.trim() !== '' ? '-' + session.trim() : ''}`
-    ),
+    userDataDir: path.join(process.cwd(), session),
     args: [...puppeteerConfig.chroniumArgs],
     ...extras,
   });

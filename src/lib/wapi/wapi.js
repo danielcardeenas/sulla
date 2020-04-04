@@ -1,4 +1,5 @@
 import {
+  _getGroupParticipants,
   addParticipant,
   areAllMessagesLoaded,
   asyncLoadAllEarlierMessages,
@@ -75,8 +76,7 @@ import {
   setMyStatus,
   startTyping,
   stopTyping,
-  unblockContact,
-  _getGroupParticipants,
+  unblockContact
 } from './functions';
 import { base64ToFile, generateMediaKey, getFileHash } from './helper';
 import {
@@ -87,7 +87,7 @@ import {
   addOnParticipantsChange,
   addOnStateChange,
   allNewMessagesListener,
-  initNewMessagesListener,
+  initNewMessagesListener
 } from './listeners';
 import {
   _serializeChatObj,
@@ -95,12 +95,12 @@ import {
   _serializeMessageObj,
   _serializeNumberStatusObj,
   _serializeProfilePicThumb,
-  _serializeRawObj,
+  _serializeRawObj
 } from './serializers';
 import { getStore } from './store/get-store';
 
 if (!window.Store || !window.Store.Msg) {
-  (function () {
+  (function() {
     const parasite = `parasite${Date.now()}`;
     // webpackJsonp([], { [parasite]: (x, y, z) => getStore(z) }, [parasite]);
     if (typeof webpackJsonp === 'function')
@@ -109,13 +109,13 @@ if (!window.Store || !window.Store.Msg) {
       webpackJsonp.push([
         [parasite],
         { [parasite]: (x, y, z) => getStore(z) },
-        [[parasite]],
+        [[parasite]]
       ]);
   })();
 }
 
 window.WAPI = {
-  lastRead: {},
+  lastRead: {}
 };
 
 // Serializers assignations
@@ -126,9 +126,49 @@ window.WAPI._serializeMessageObj = _serializeMessageObj;
 window.WAPI._serializeNumberStatusObj = _serializeNumberStatusObj;
 window.WAPI._serializeProfilePicThumb = _serializeProfilePicThumb;
 
-// Functions
+// Group Functions
 window.WAPI.createGroup = createGroup;
 window.WAPI.leaveGroup = leaveGroup;
+window.WAPI.revokeGroupInviteLink = revokeGroupInviteLink;
+window.WAPI.getGroupInviteLink = getGroupInviteLink;
+window.WAPI.getGroupAdmins = getGroupAdmins;
+window.WAPI.removeParticipant = removeParticipant;
+window.WAPI.addParticipant = addParticipant;
+window.WAPI.promoteParticipant = promoteParticipant;
+window.WAPI.demoteParticipant = demoteParticipant;
+
+// Chatting functions
+window.WAPI.sendChatstate = sendChatstate;
+window.WAPI.sendMessageWithThumb = sendMessageWithThumb;
+window.WAPI.processMessageObj = processMessageObj;
+window.WAPI.sendMessageWithTags = sendMessageWithTags;
+window.WAPI.sendMessage = sendMessage;
+window.WAPI.sendMessage2 = sendMessage2;
+window.WAPI.sendSeen = sendSeen;
+window.WAPI.deleteConversation = deleteConversation;
+window.WAPI.deleteMessages = deleteMessages;
+window.WAPI.clearChat = clearChat;
+window.WAPI.sendMessageToID = sendMessageToID;
+window.WAPI.sendImage = sendImage;
+window.WAPI.sendFile = sendFile;
+window.WAPI.setMyName = setMyName;
+window.WAPI.setMyStatus = setMyStatus;
+window.WAPI.sendVideoAsGif = sendVideoAsGif;
+window.WAPI.processFiles = processFiles;
+window.WAPI.sendImageWithProduct = sendImageWithProduct;
+window.WAPI.sendContact = sendContact;
+window.WAPI.forwardMessages = forwardMessages;
+window.WAPI.reply = reply;
+window.WAPI._sendSticker = sendSticker;
+window.WAPI.encryptAndUploadFile = encryptAndUploadFile;
+window.WAPI.sendImageAsSticker = sendImageAsSticker;
+window.WAPI.startTyping = startTyping;
+window.WAPI.stopTyping = stopTyping;
+window.WAPI.sendLocation = sendLocation;
+window.WAPI.blockContact = blockContact;
+window.WAPI.unblockContact = unblockContact;
+
+// Retrieving functions
 window.WAPI.getAllContacts = getAllContacts;
 window.WAPI.getMyContacts = getMyContacts;
 window.WAPI.getContact = getContact;
@@ -140,13 +180,9 @@ window.WAPI.getAllNewMessages = getAllNewMessages;
 window.WAPI.getAllUnreadMessages = getAllUnreadMessages;
 window.WAPI.getAllChatsWithMessages = getAllChatsWithMessages;
 window.WAPI.getAllGroups = getAllGroups;
-window.WAPI.sendChatstate = sendChatstate;
 window.WAPI.getChat = getChat;
 window.WAPI.getStatus = getStatus;
 window.WAPI.getChatByName = getChatByName;
-window.WAPI.sendMessageWithThumb = sendMessageWithThumb;
-window.WAPI.revokeGroupInviteLink = revokeGroupInviteLink;
-window.WAPI.getGroupInviteLink = getGroupInviteLink;
 window.WAPI.getNewId = getNewId;
 window.WAPI.getChatById = getChatById;
 window.WAPI.getUnreadMessagesInChat = getUnreadMessagesInChat;
@@ -159,56 +195,26 @@ window.WAPI.getAllGroupMetadata = getAllGroupMetadata;
 window.WAPI.getGroupMetadata = getGroupMetadata;
 window.WAPI._getGroupParticipants = _getGroupParticipants;
 window.WAPI.getGroupParticipantIDs = getGroupParticipantIDs;
-window.WAPI.getGroupAdmins = getGroupAdmins;
-window.WAPI.getHost = getHost;
-window.WAPI.getMe = getMe;
-window.WAPI.isLoggedIn = isLoggedIn;
-window.WAPI.isConnected = isConnected;
-window.WAPI.processMessageObj = processMessageObj;
 window.WAPI.getAllMessagesInChat = getAllMessagesInChat;
 window.WAPI.loadAndGetAllMessagesInChat = loadAndGetAllMessagesInChat;
-window.WAPI.sendMessageWithTags = sendMessageWithTags;
-window.WAPI.sendMessage = sendMessage;
-window.WAPI.sendMessage2 = sendMessage2;
-window.WAPI.sendSeen = sendSeen;
 window.WAPI.getUnreadMessages = getUnreadMessages;
 window.WAPI.getCommonGroups = getCommonGroups;
 window.WAPI.getProfilePicFromServer = getProfilePicFromServer;
 window.WAPI.downloadFileWithCredentials = downloadFileWithCredentials;
-window.WAPI.getBatteryLevel = getBatteryLevel;
-window.WAPI.deleteConversation = deleteConversation;
-window.WAPI.deleteMessages = deleteMessages;
-window.WAPI.clearChat = clearChat;
 window.WAPI.getNumberProfile = getNumberProfile;
 window.WAPI.getMessageById = getMessageById;
-window.WAPI.sendMessageToID = sendMessageToID;
-window.WAPI.sendImage = sendImage;
-window.WAPI.sendFile = sendFile;
-window.WAPI.setMyName = setMyName;
-window.WAPI.setMyStatus = setMyStatus;
-window.WAPI.sendVideoAsGif = sendVideoAsGif;
-window.WAPI.processFiles = processFiles;
-window.WAPI.sendImageWithProduct = sendImageWithProduct;
-window.WAPI.base64ImageToFile = base64ToFile;
-window.WAPI.base64ToFile = base64ToFile;
-window.WAPI.sendContact = sendContact;
-window.WAPI.forwardMessages = forwardMessages;
 window.WAPI.getNewMessageId = getNewMessageId;
-window.WAPI.reply = reply;
-window.WAPI._sendSticker = sendSticker;
 window.WAPI.getFileHash = getFileHash;
 window.WAPI.generateMediaKey = generateMediaKey;
-window.WAPI.encryptAndUploadFile = encryptAndUploadFile;
-window.WAPI.sendImageAsSticker = sendImageAsSticker;
-window.WAPI.startTyping = startTyping;
-window.WAPI.stopTyping = stopTyping;
-window.WAPI.sendLocation = sendLocation;
-window.WAPI.blockContact = blockContact;
-window.WAPI.unblockContact = unblockContact;
-window.WAPI.removeParticipant = removeParticipant;
-window.WAPI.addParticipant = addParticipant;
-window.WAPI.promoteParticipant = promoteParticipant;
-window.WAPI.demoteParticipant = demoteParticipant;
+
+// Device functions
+window.WAPI.getHost = getHost;
+window.WAPI.getMe = getMe;
+window.WAPI.isLoggedIn = isLoggedIn;
+window.WAPI.isConnected = isConnected;
+window.WAPI.getBatteryLevel = getBatteryLevel;
+window.WAPI.base64ImageToFile = base64ToFile;
+window.WAPI.base64ToFile = base64ToFile;
 
 // Listeners initialization
 window.WAPI._newMessagesQueue = [];
@@ -239,65 +245,65 @@ addOnAddedToGroup();
 /**
  * New version of @tag message
  */
-window.WAPI.sendMessageMentioned = async function (chatId, message, mentioned) {
+window.WAPI.sendMessageMentioned = async function(chatId, message, mentioned) {
   if (!Array.isArray(mentioned)) {
     mentioned = [mentioned];
   }
 
   const chat = WAPI.getChat(chatId);
-  const users = await Store.Contact.serialize().filter((x) =>
+  const users = await Store.Contact.serialize().filter(x =>
     mentioned.includes(x.id.user)
   );
 
   chat.sendMessage(message, {
     linkPreview: null,
-    mentionedJidList: users.map((u) => u.id),
+    mentionedJidList: users.map(u => u.id),
     quotedMsg: null,
-    quotedMsgAdminGroupJid: null,
+    quotedMsgAdminGroupJid: null
   });
 };
 
-window.WAPI.getProfilePicSmallFromId = function (id, done) {
+window.WAPI.getProfilePicSmallFromId = function(id, done) {
   window.Store.ProfilePicThumb.find(id).then(
-    function (d) {
+    function(d) {
       if (d.img !== undefined) {
         window.WAPI.downloadFileWithCredentials(d.img, done);
       } else {
         done(false);
       }
     },
-    function (e) {
+    function(e) {
       done(false);
     }
   );
 };
 
-window.WAPI.getProfilePicFromId = function (id, done) {
+window.WAPI.getProfilePicFromId = function(id, done) {
   window.Store.ProfilePicThumb.find(id).then(
-    function (d) {
+    function(d) {
       if (d.imgFull !== undefined) {
         window.WAPI.downloadFileWithCredentials(d.imgFull, done);
       } else {
         done(false);
       }
     },
-    function (e) {
+    function(e) {
       done(false);
     }
   );
 };
 
-window.WAPI.getGeneratedUserAgent = function (useragent) {
+window.WAPI.getGeneratedUserAgent = function(useragent) {
   if (!useragent.includes('WhatsApp')) return 'WhatsApp/0.4.315 ' + useragent;
   return useragent.replace(
     useragent
       .match(/WhatsApp\/([.\d])*/g)[0]
       .match(/[.\d]*/g)
-      .find((x) => x),
+      .find(x => x),
     window.Debug.VERSION
   );
 };
 
-window.WAPI.getWAVersion = function () {
-  return window.DEBUG.VERSION;
+window.WAPI.getWAVersion = function() {
+  return window.Debug.VERSION;
 };
