@@ -10,6 +10,7 @@
 ![npm type definitions](https://img.shields.io/npm/types/sulla)
 ![GitHub last commit](https://img.shields.io/github/last-commit/danielcardeenas/sulla)
 [![GitHub license](https://img.shields.io/github/license/danielcardeenas/sulla)](https://github.com/danielcardeenas/sulla/blob/master/LICENSE)
+[![codebeat badge](https://codebeat.co/badges/7e510d47-8689-49da-abd8-a9a29d106a2b)](https://codebeat.co/projects/github-com-danielcardeenas-sulla-master)
 
 > Sulla is a javascript library which provides a high-level API control to
 > Whatsapp so it can be configured to automatize resposes or any data that goes
