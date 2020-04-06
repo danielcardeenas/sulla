@@ -103,11 +103,11 @@ client.onMessage(async (message) => {
     // At this point you can do whatever you want with the buffer
     // Most likely you want to write it into a file
     const fileName = `some-file-name.${mime.extension(message.mimetype)}`;
-      fs.writeFile(fileName, buffer, function (err) {
-        ...
-      });
+    fs.writeFile(fileName, buffer, function (err) {
+      ...
     });
   }
+});
 ```
 
 ## Basic functions (usage)
@@ -313,6 +313,7 @@ client.onStateChange((state) => {
 ```
 
 #### Send message to new contacts (non-added)
+
 Also see [Whatsapp links](https://faq.whatsapp.com/en/26000030/)
 Be careful since this can pretty much could cause a ban from Whatsapp, always keep your contacts updated!
 
@@ -382,6 +383,7 @@ To build the entire project just run
 ```
 
 ## Sulla state
+
 As of version `2.3.1` it seems that sulla has reached a very rich and stable functionality and architecture. As much as I would love to, I cannot dedicate a lot of time to this project so please consider checking out forked versions of sulla where other developers can dedicate more time and support to it.
 
 ## Maintainers
