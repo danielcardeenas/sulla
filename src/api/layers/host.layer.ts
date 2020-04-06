@@ -7,7 +7,6 @@ declare module WAPI {
   const getWAVersion: () => string;
   const isConnected: () => boolean;
   const getBatteryLevel: () => number;
-  const getGeneratedUserAgent: (userAgent?: string) => string;
 }
 
 export class HostLayer {
@@ -50,16 +49,5 @@ export class HostLayer {
    */
   public async getBatteryLevel() {
     return await this.page.evaluate(() => WAPI.getBatteryLevel());
-  }
-
-  /**
-   * Get the generated user agent, this is so you can send it to the decryption module.
-   * @returns String useragent of wa-web session
-   */
-  public async getGeneratedUserAgent(userAgent: string) {
-    return await this.page.evaluate(
-      ({ userAgent }) => WAPI.getGeneratedUserAgent(userAgent),
-      { userAgent }
-    );
   }
 }

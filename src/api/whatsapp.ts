@@ -1,10 +1,10 @@
 import { Page } from 'puppeteer';
+import { decrypt } from './helpers/decrypt';
 import { GroupLayer } from './layers/group.layer';
+import { Message } from './model';
 
-declare global {
-  interface Window {
-    l10n: any;
-  }
+declare module WAPI {
+  const arrayBufferToBase64: (buffer: ArrayBuffer) => string;
 }
 
 export class Whatsapp extends GroupLayer {
@@ -43,6 +43,26 @@ export class Whatsapp extends GroupLayer {
 
     if (this.page.browser) {
       await this.page.browser().close();
+    }
+  }
+
+  /**
+   * Decrypts message file
+   * @param message Message object
+   * @returns Decrypted file buffer (null otherwise)
+   */
+  public async downloadFile(message: Message) {
+    if (message.isMedia) {
+      const url = message.clientUrl;
+      const encBase64 = await this.page.evaluate((url: string) => {
+        return fetch(url)
+          .then((response) => response.arrayBuffer())
+          .then((bytes) => WAPI.arrayBufferToBase64(bytes));
+      }, url);
+
+      return decrypt(encBase64, message);
+    } else {
+      return null;
     }
   }
 }

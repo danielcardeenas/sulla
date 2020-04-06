@@ -76,9 +76,14 @@ import {
   setMyStatus,
   startTyping,
   stopTyping,
-  unblockContact
+  unblockContact,
 } from './functions';
-import { base64ToFile, generateMediaKey, getFileHash } from './helper';
+import {
+  base64ToFile,
+  generateMediaKey,
+  getFileHash,
+  arrayBufferToBase64,
+} from './helper';
 import {
   addNewMessagesListener,
   addOnAddedToGroup,
@@ -87,7 +92,7 @@ import {
   addOnParticipantsChange,
   addOnStateChange,
   allNewMessagesListener,
-  initNewMessagesListener
+  initNewMessagesListener,
 } from './listeners';
 import {
   _serializeChatObj,
@@ -95,12 +100,12 @@ import {
   _serializeMessageObj,
   _serializeNumberStatusObj,
   _serializeProfilePicThumb,
-  _serializeRawObj
+  _serializeRawObj,
 } from './serializers';
 import { getStore } from './store/get-store';
 
 if (!window.Store || !window.Store.Msg) {
-  (function() {
+  (function () {
     const parasite = `parasite${Date.now()}`;
     // webpackJsonp([], { [parasite]: (x, y, z) => getStore(z) }, [parasite]);
     if (typeof webpackJsonp === 'function')
@@ -109,13 +114,13 @@ if (!window.Store || !window.Store.Msg) {
       webpackJsonp.push([
         [parasite],
         { [parasite]: (x, y, z) => getStore(z) },
-        [[parasite]]
+        [[parasite]],
       ]);
   })();
 }
 
 window.WAPI = {
-  lastRead: {}
+  lastRead: {},
 };
 
 // Serializers assignations
@@ -206,6 +211,7 @@ window.WAPI.getMessageById = getMessageById;
 window.WAPI.getNewMessageId = getNewMessageId;
 window.WAPI.getFileHash = getFileHash;
 window.WAPI.generateMediaKey = generateMediaKey;
+window.WAPI.arrayBufferToBase64 = arrayBufferToBase64;
 
 // Device functions
 window.WAPI.getHost = getHost;
@@ -245,65 +251,54 @@ addOnAddedToGroup();
 /**
  * New version of @tag message
  */
-window.WAPI.sendMessageMentioned = async function(chatId, message, mentioned) {
+window.WAPI.sendMessageMentioned = async function (chatId, message, mentioned) {
   if (!Array.isArray(mentioned)) {
     mentioned = [mentioned];
   }
 
   const chat = WAPI.getChat(chatId);
-  const users = await Store.Contact.serialize().filter(x =>
+  const users = await Store.Contact.serialize().filter((x) =>
     mentioned.includes(x.id.user)
   );
 
   chat.sendMessage(message, {
     linkPreview: null,
-    mentionedJidList: users.map(u => u.id),
+    mentionedJidList: users.map((u) => u.id),
     quotedMsg: null,
-    quotedMsgAdminGroupJid: null
+    quotedMsgAdminGroupJid: null,
   });
 };
 
-window.WAPI.getProfilePicSmallFromId = function(id, done) {
+window.WAPI.getProfilePicSmallFromId = function (id, done) {
   window.Store.ProfilePicThumb.find(id).then(
-    function(d) {
+    function (d) {
       if (d.img !== undefined) {
         window.WAPI.downloadFileWithCredentials(d.img, done);
       } else {
         done(false);
       }
     },
-    function(e) {
+    function (e) {
       done(false);
     }
   );
 };
 
-window.WAPI.getProfilePicFromId = function(id, done) {
+window.WAPI.getProfilePicFromId = function (id, done) {
   window.Store.ProfilePicThumb.find(id).then(
-    function(d) {
+    function (d) {
       if (d.imgFull !== undefined) {
         window.WAPI.downloadFileWithCredentials(d.imgFull, done);
       } else {
         done(false);
       }
     },
-    function(e) {
+    function (e) {
       done(false);
     }
   );
 };
 
-window.WAPI.getGeneratedUserAgent = function(useragent) {
-  if (!useragent.includes('WhatsApp')) return 'WhatsApp/0.4.315 ' + useragent;
-  return useragent.replace(
-    useragent
-      .match(/WhatsApp\/([.\d])*/g)[0]
-      .match(/[.\d]*/g)
-      .find(x => x),
-    window.Debug.VERSION
-  );
-};
-
-window.WAPI.getWAVersion = function() {
+window.WAPI.getWAVersion = function () {
   return window.Debug.VERSION;
 };

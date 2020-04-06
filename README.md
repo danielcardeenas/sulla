@@ -36,10 +36,10 @@
 // import { create, Whatsapp } from 'sulla';
 const sulla = require('sulla');
 
-sulla.create().then(client => start(client));
+sulla.create().then((client) => start(client));
 
 function start(client) {
-  client.onMessage(message => {
+  client.onMessage((message) => {
     if (message.body === 'Hi') {
       client.sendText(message.from, '👋 Hello from sulla!');
     }
@@ -74,7 +74,7 @@ somewhere else heres how:
 const fs = require('fs');
 
 // Second create() parameter is the QR callback
-sulla.create('session-marketing', qrCode => {
+sulla.create('session-marketing', (qrCode) => {
   exportQR(qrCode, 'marketing-qr.png');
 });
 
@@ -86,6 +86,23 @@ function exportQR(qrCode, path) {
   // Creates 'marketing-qr.png' file
   fs.writeFileSync(path, imageBuffer);
 }
+```
+
+## Downloading files
+
+Puppeteer takes care of the file downloading. The decryption is being done as fast as possible (outruns native methods).
+Supports big files!
+
+```javascript
+client.onMessage(async (message) => {
+  const buffer = await client.downloadFile(message);
+  // At this point you can do whatever you want with the buffer
+  // Like writing it intto a file
+  const fileName = `some-file-name.${mime.extension(message.mimetype)}`;
+    fs.writeFile(fileName, buffer, function (err) {
+      ...
+    });
+  });
 ```
 
 ## Basic functions (usage)
@@ -110,7 +127,7 @@ await client.sendImage(
 // Send @tagged message
 await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', [
   '5218113130740',
-  '5218243160777'
+  '5218243160777',
 ]);
 
 // Reply to a message
@@ -282,7 +299,7 @@ There are some tricks for a better usage of sulla.
 ```javascript
 // In case of being logged out of whatsapp web
 // Force it to keep the current session
-client.onStateChange(state => {
+client.onStateChange((state) => {
   if (state === 'UNLAUNCHED') {
     client.useHere();
   }

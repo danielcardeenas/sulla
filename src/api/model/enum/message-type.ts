@@ -12,3 +12,12 @@ export enum MessageType {
   REVOKED = 'revoked',
   UNKNOWN = 'unknown',
 }
+
+export enum MediaType {
+  IMAGE = 'Image',
+  VIDEO = 'Video',
+  AUDIO = 'Audio',
+  PTT = 'Audio',
+  DOCUMENT = 'Document',
+  STICKER = 'Image',
+}
