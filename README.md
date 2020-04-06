@@ -313,8 +313,8 @@ client.onStateChange((state) => {
 ```
 
 #### Send message to new contacts (non-added)
-
 Also see [Whatsapp links](https://faq.whatsapp.com/en/26000030/)
+Be careful since this can pretty much could cause a ban from Whatsapp, always keep your contacts updated!
 
 ```javascript
 await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋');
@@ -380,6 +380,9 @@ To build the entire project just run
 ```bash
 > npm run build
 ```
+
+## Sulla state
+As of version `2.3.1` it seems that sulla has reached a very rich and stable functionality and architecture.
 
 ## Maintainers
 
