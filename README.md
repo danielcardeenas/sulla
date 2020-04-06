@@ -57,10 +57,10 @@ function start(client) {
 
 ```javascript
 // Init sales whatsapp bot
-sulla.create('sales').then((salesBot) => {...});
+sulla.create('sales').then((salesClient) => {...});
 
 // Init support whatsapp bot
-sulla.create('support').then((supportBot) => {...});
+sulla.create('support').then((supportClient) => {...});
 ```
 
 <br>
