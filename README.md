@@ -101,7 +101,7 @@ client.onMessage(async (message) => {
   if (message.isMedia) {
     const buffer = await client.downloadFile(message);
     // At this point you can do whatever you want with the buffer
-    // Like writing it intto a file
+    // Most likely you want to write it into a file
     const fileName = `some-file-name.${mime.extension(message.mimetype)}`;
       fs.writeFile(fileName, buffer, function (err) {
         ...
