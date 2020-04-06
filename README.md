@@ -294,6 +294,9 @@ await client.clearChat(chatId);
 
 // Delete message (last parameter: delete only locally)
 await client.deleteMessage(chatId, message.id.toString(), false);
+
+// Retrieve a number profile / check if contact is a valid whatsapp number
+const profile = await client.getNumberProfile('0000000@c.us')
 ```
 
 ## Misc
