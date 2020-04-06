@@ -113,7 +113,7 @@ client.onMessage(async (message) => {
 ## Basic functions (usage)
 
 Not every available function is listed, for further look, every function
-available can be found in [here](/src/api/layers).
+available can be found in [here](/src/api/layers) and [here](/src/lib/wapi/functions)
 
 ### Chatting
 
