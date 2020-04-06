@@ -265,8 +265,9 @@ client.onLiveLocation(chatId, (liveLocation) => {
   ...
 });
 
-// Listen to group participant changes
-client.onParticipantsChanged(chatId, (participantChange) => {
+// chatId looks like this: '5518156745634-1516512045@g.us'
+// Event interface is in here: https://github.com/danielcardeenas/sulla/blob/master/src/api/model/participant-event.ts
+client.onParticipantsChanged(chatId, (event) => {
   ...
 });
 
