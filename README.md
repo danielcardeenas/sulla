@@ -382,7 +382,7 @@ To build the entire project just run
 ```
 
 ## Sulla state
-As of version `2.3.1` it seems that sulla has reached a very rich and stable functionality and architecture.
+As of version `2.3.1` it seems that sulla has reached a very rich and stable functionality and architecture. As much as I would love to, I cannot dedicate a lot of time to this project so please consider checking out forked version of sulla where other developers can dedicate more time and support to it.
 
 ## Maintainers
 
