@@ -1,4 +1,5 @@
 import * as ora from 'ora';
+import { readFileSync } from 'fs';
 import { Whatsapp } from '../api/whatsapp';
 import { CreateConfig } from '../config/create-config';
 import { isAuthenticated, isInsideChat, retrieveQR } from './auth';
@@ -38,6 +39,9 @@ export async function create(
   spinner.start('Injecting api');
   waPage = await injectApi(waPage);
   spinner.succeed('Whatsapp is ready');
+  
+  const debugURL = `http://localhost:${readFileSync('./session/DevToolsActivePort').slice(0, -54)}`;
+  console.log(`\nDebug ➜ \x1b[34m${debugURL}\x1b[0m`);
 
   return new Whatsapp(waPage);
 }
