@@ -4,6 +4,7 @@ session
 session-*
 assets
 app.js
+app.ts
 gohan.jpg
 006.png
 src/app.ts
