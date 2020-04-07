@@ -57,10 +57,10 @@ function start(client) {
 
 ```javascript
 // Init sales whatsapp bot
-sulla.create('sales').then((salesBot) => {...});
+sulla.create('sales').then((salesClient) => {...});
 
 // Init support whatsapp bot
-sulla.create('support').then((supportBot) => {...});
+sulla.create('support').then((supportClient) => {...});
 ```
 
 <br>
@@ -113,7 +113,7 @@ client.onMessage(async (message) => {
 ## Basic functions (usage)
 
 Not every available function is listed, for further look, every function
-available can be found in [here](/src/api/layers).
+available can be found in [here](/src/api/layers) and [here](/src/lib/wapi/functions)
 
 ### Chatting
 
@@ -294,6 +294,9 @@ await client.clearChat(chatId);
 
 // Delete message (last parameter: delete only locally)
 await client.deleteMessage(chatId, message.id.toString(), false);
+
+// Retrieve a number profile / check if contact is a valid whatsapp number
+const profile = await client.getNumberProfile('0000000@c.us')
 ```
 
 ## Misc
