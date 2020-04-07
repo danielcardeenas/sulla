@@ -10,7 +10,7 @@ export async function initWhatsapp(session: string, options: CreateConfig) {
   const browser = await initBrowser(session, options);
   const waPage = await getWhatsappPage(browser);
   await waPage.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
   );
 
   await waPage.goto(puppeteerConfig.whatsappUrl);
@@ -44,14 +44,16 @@ async function initBrowser(
   options: CreateConfig,
   extras = {}
 ) {
-  try {
-    const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
-    if (chromeInstalations.length) {
-      extras = { ...extras, executablePath: chromeInstalations[0] };
+  if (options.useChrome) {
+    try {
+      const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
+      if (chromeInstalations.length) {
+        extras = { ...extras, executablePath: chromeInstalations[0] };
+      }
+    } catch (error) {
+      console.log('Chrome not found, using chromium');
+      extras = {};
     }
-  } catch (error) {
-    console.log('Chrome not found, using chromium');
-    extras = {};
   }
 
   // Use stealth plugin to avoid being detected as a bot

@@ -12,7 +12,12 @@ const spinner = ora();
 export async function create(
   session = 'session',
   catchQR?: (qrCode: string) => void,
-  options: CreateConfig = { headless: true, devtools: false }
+  options: CreateConfig = {
+    headless: true,
+    devtools: false,
+    useChrome: true,
+    debug: false,
+  }
 ) {
   spinner.start('Initializing whatsapp');
   let waPage = await initWhatsapp(session, options);
@@ -40,8 +45,12 @@ export async function create(
   waPage = await injectApi(waPage);
   spinner.succeed('Whatsapp is ready');
 
-  const debugURL = `http://localhost:${readFileSync('./session/DevToolsActivePort').slice(0, -54)}`;
-  console.log(`\nDebug ➜ \x1b[34m${debugURL}\x1b[0m`);
+  if (options.debug) {
+    const debugURL = `http://localhost:${readFileSync(
+      `./${session}/DevToolsActivePort`
+    ).slice(0, -54)}`;
+    console.log(`\nDebug: \x1b[34m${debugURL}\x1b[0m`);
+  }
 
   return new Whatsapp(waPage);
 }
