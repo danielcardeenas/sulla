@@ -44,9 +44,14 @@ async function initBrowser(
   options: CreateConfig,
   extras = {}
 ) {
-  const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
-  if (chromeInstalations.length) {
-    extras = { ...extras, executablePath: chromeInstalations[0] };
+  try {
+    const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
+    if (chromeInstalations.length) {
+      extras = { ...extras, executablePath: chromeInstalations[0] };
+    }
+  } catch (error) {
+    console.log('Chrome not found, using chromium');
+    extras = {};
   }
 
   // Use stealth plugin to avoid being detected as a bot
