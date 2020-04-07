@@ -23,6 +23,11 @@
 > By deafult sulla will try to use Google Chrome driver if installed, if not, it
 > will use integrated Chromium instance
 
+#### Changelog:
+> ☑️ Bundle size now just 300 kB
+>
+> ☑️ Added `debug` option and  `useChrome` to `create()`
+
 ## Installation
 
 ```bash
@@ -356,6 +361,8 @@ try {
 }
 ```
 
+### Debugging
+
 ## Development
 
 Building sulla is really simple altough it contians 3 main projects inside
@@ -387,7 +394,7 @@ To build the entire project just run
 
 ## Sulla state
 
-As of version `2.3.1` it seems that sulla has reached a very rich and stable functionality and architecture. As much as I would love to, I cannot dedicate a lot of time to this project so please consider checking out forked versions of sulla where other developers can dedicate more time and support to it.
+As of version `2.3.5` it seems that sulla has reached a very rich and stable functionality and architecture. As much as I would love to, I cannot dedicate a lot of time to this project so please consider checking out forked versions of sulla where other developers can dedicate more time and support to it.
 
 ## Maintainers
 
