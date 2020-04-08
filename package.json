@@ -11,6 +11,7 @@
     "build:wapi": "cd src/lib/wapi/ && webpack",
     "build:middleware": "cd src/lib/middleware/ && webpack",
     "build:jsQR": "cd src/lib/jsQR/ && gulp",
+    "build:docs": "typedoc && git add docs/*",
     "watch": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
     "clean": "rm -rf session && rm -rf dist",
     "test": "echo \"No tests yet\"",
@@ -25,7 +26,7 @@
       "tagName": "v${version}"
     },
     "hooks": {
-      "after:bump": "npm run changelog"
+      "after:bump": "npm run changelog && npm build:docs"
     },
     "npm": {
       "publish": true
@@ -71,6 +72,7 @@
     "pretty-quick": "^2.0.1",
     "release-it": "^13.5.2",
     "ts-loader": "^6.2.2",
+    "typedoc": "^0.17.4",
     "typescript": "^3.8.3",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
