@@ -13,7 +13,26 @@
     "build:jsQR": "cd src/lib/jsQR/ && gulp",
     "watch": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
     "clean": "rm -rf session && rm -rf dist",
-    "test": "echo \"No tests yet\""
+    "test": "echo \"No tests yet\"",
+    "changelog": "auto-changelog -p && git add CHANGELOG.md",
+    "release": "read -p 'GITHUB_TOKEN: ' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-it"
+  },
+  "release-it": {
+    "github": {
+      "release": true
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "hooks": {
+      "after:bump": "npm run changelog"
+    },
+    "npm": {
+      "publish": true
+    }
+  },
+  "auto-changelog": {
+    "commitLimit": false
   },
   "husky": {
     "hooks": {
@@ -42,6 +61,7 @@
     "@types/node": "^13.11.0",
     "@types/puppeteer": "^2.0.1",
     "@types/sharp": "^0.24.0",
+    "auto-changelog": "^1.16.4",
     "concurrently": "^5.1.0",
     "copy-webpack-plugin": "^5.1.1",
     "gulp": "^4.0.2",
@@ -49,6 +69,7 @@
     "nodemon": "^2.0.2",
     "prettier": "^2.0.2",
     "pretty-quick": "^2.0.1",
+    "release-it": "^13.5.2",
     "ts-loader": "^6.2.2",
     "typescript": "^3.8.3",
     "webpack": "^4.42.1",
