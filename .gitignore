@@ -2,7 +2,6 @@ node_modules
 dist
 session
 session-*
-assets
 app.js
 app.ts
 gohan.jpg
