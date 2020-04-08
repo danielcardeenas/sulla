@@ -17,6 +17,7 @@ export {
   GroupChangeEvent,
   GroupNotificationType,
   MessageType,
+  SocketState,
 } from './api/model/enum';
 export { Whatsapp } from './api/whatsapp';
 export { create } from './controllers/initializer';
