@@ -24,6 +24,8 @@
 > will use integrated Chromium instance
 
 #### Changelog:
+> ☑️ Fixed video send, fixed optional `create()` parameters
+>
 > ☑️ Bundle size now just 300 kB
 >
 > ☑️ Added `debug` option and  `useChrome` to `create()`
