@@ -24,7 +24,7 @@
 > will use integrated Chromium instance
 
 #### Changelog:
-> ☑️ Added c.ts types comments for friendlier development
+> ☑️ Added d.ts types comments for friendlier development
 >
 > ☑️ Fixed video send, fixed optional `create()` parameters
 >
