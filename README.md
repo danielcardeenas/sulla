@@ -25,13 +25,14 @@
 > will use integrated Chromium instance
 
 #### Changelog:
+
 > ☑️ Added d.ts types comments for friendlier development
 >
 > ☑️ Fixed video send, fixed optional `create()` parameters
 >
 > ☑️ Bundle size now just 300 kB
 >
-> ☑️ Added `debug` option and  `useChrome` to `create()`
+> ☑️ Added `debug` option and `useChrome` to `create()`
 
 ## Installation
 
@@ -46,10 +47,10 @@
 // import { create, Whatsapp } from 'sulla';
 const sulla = require('sulla');
 
-sulla.create().then((client) => start(client));
+sulla.create().then(client => start(client));
 
 function start(client) {
-  client.onMessage((message) => {
+  client.onMessage(message => {
     if (message.body === 'Hi') {
       client.sendText(message.from, '👋 Hello from sulla!');
     }
@@ -76,15 +77,17 @@ sulla.create('support').then((supportClient) => {...});
 <br>
 
 ## Optional init options
-Sulla `create()` method third parameter can have the following optional parameters:
+
+Sulla `create()` method third parameter can have the following optional
+parameters:
 
 ```javascript
 create('sessionName', qrCallback, {
   headless: true, // Headless chrome
   devtools: false, // Open devtools by default
   useChrome: true, // If false will use Chromium instance
-  debug: false, // Opens a debug session
-})
+  debug: false // Opens a debug session
+});
 ```
 
 ##### The type definition con be found in here: [CreateConfig.ts](https://github.com/danielcardeenas/sulla/blob/affd816d83cc065bf953c9cc5328d935e9fc04c8/src/config/create-config.ts)
@@ -98,7 +101,7 @@ somewhere else heres how:
 const fs = require('fs');
 
 // Second create() parameter is the QR callback
-sulla.create('session-marketing', (qrCode) => {
+sulla.create('session-marketing', qrCode => {
   exportQR(qrCode, 'marketing-qr.png');
 });
 
@@ -114,8 +117,8 @@ function exportQR(qrCode, path) {
 
 ## Downloading files
 
-Puppeteer takes care of the file downloading. The decryption is being done as fast as possible (outruns native methods).
-Supports big files!
+Puppeteer takes care of the file downloading. The decryption is being done as
+fast as possible (outruns native methods). Supports big files!
 
 ```javascript
 import fs = require('fs');
@@ -137,7 +140,8 @@ client.onMessage(async (message) => {
 ## Basic functions (usage)
 
 Not every available function is listed, for further look, every function
-available can be found in [here](/src/api/layers) and [here](/src/lib/wapi/functions)
+available can be found in [here](/src/api/layers) and
+[here](/src/lib/wapi/functions)
 
 ### Chatting
 
@@ -156,7 +160,7 @@ await client.sendImage(
 // Send @tagged message
 await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', [
   '5218113130740',
-  '5218243160777',
+  '5218243160777'
 ]);
 
 // Reply to a message
@@ -320,7 +324,7 @@ await client.clearChat(chatId);
 await client.deleteMessage(chatId, message.id.toString(), false);
 
 // Retrieve a number profile / check if contact is a valid whatsapp number
-const profile = await client.getNumberProfile('0000000@c.us')
+const profile = await client.getNumberProfile('0000000@c.us');
 ```
 
 ## Misc
@@ -332,7 +336,7 @@ There are some tricks for a better usage of sulla.
 ```javascript
 // In case of being logged out of whatsapp web
 // Force it to keep the current session
-client.onStateChange((state) => {
+client.onStateChange(state => {
   if (state === 'UNLAUNCHED') {
     client.useHere();
   }
@@ -341,8 +345,9 @@ client.onStateChange((state) => {
 
 #### Send message to new contacts (non-added)
 
-Also see [Whatsapp links](https://faq.whatsapp.com/en/26000030/)
-Be careful since this can pretty much could cause a ban from Whatsapp, always keep your contacts updated!
+Also see [Whatsapp links](https://faq.whatsapp.com/en/26000030/) Be careful
+since this can pretty much could cause a ban from Whatsapp, always keep your
+contacts updated!
 
 ```javascript
 await client.sendMessageToId('5212234234@c.us', 'Hello from sulla! 👋');
@@ -413,7 +418,10 @@ To build the entire project just run
 
 ## Sulla state
 
-As of version `2.3.5` it seems that sulla has reached a very rich and stable functionality and architecture. As much as I would love to, I cannot dedicate a lot of time to this project so please consider checking out forked versions of sulla where other developers can dedicate more time and support to it.
+As of version `2.3.5` it seems that sulla has reached a very rich and stable
+functionality and architecture. As much as I would love to, I cannot dedicate a
+lot of time to this project so please consider checking out forked versions of
+sulla where other developers can dedicate more time and support to it.
 
 ## Maintainers
 
@@ -428,6 +436,5 @@ discuss what you would like to change.
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla?ref=badge_large)
