@@ -24,6 +24,8 @@
 > will use integrated Chromium instance
 
 #### Changelog:
+> ☑️ Added c.ts types comments for friendlier development
+>
 > ☑️ Fixed video send, fixed optional `create()` parameters
 >
 > ☑️ Bundle size now just 300 kB
