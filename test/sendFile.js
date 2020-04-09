@@ -1,11 +1,11 @@
-const { create } = require('../dist/index');
+const {create} = require('../dist/index');
 
 var client;
 
 async function startClient() {
   client = await create('session', () => console.log('QR Code received'), {
-    headless: false,
-    devtools: true,
+    headless : false,
+    devtools : true,
   });
 
   client.onStateChange((state) => {
@@ -14,12 +14,8 @@ async function startClient() {
     }
   });
 
-  await client.sendFile(
-    process.argv[2] + '@c.us',
-    './media/GoPro.mp4',
-    'GoPro.mp4',
-    'Test file send'
-  );
+  await client.sendFile(process.argv[2] + '@c.us', './media/GoPro.mp4',
+                        'GoPro.mp4', 'Test file send');
 }
 
 console.log('Test send file to: ' + process.argv[2]);
