@@ -44,11 +44,16 @@ export const isInsideChat = (waPage: puppeteer.Page) => {
 
 export async function retrieveQR(page: puppeteer.Page) {
   const { code, data } = await decodeQR(page);
-  qrcode.generate(code, {
-    small: true,
-  });
+  const asciiQR = await asciiQr(code);
+  return { code, data, asciiQR };
+}
 
-  return { code, data };
+async function asciiQr(code: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    qrcode.generate(code, { small: true }, (qrcode) => {
+      resolve(qrcode);
+    });
+  });
 }
 
 async function decodeQR(

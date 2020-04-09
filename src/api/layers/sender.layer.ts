@@ -289,12 +289,12 @@ export class SenderLayer extends ListenerLayer {
     );
     const mimeInfo = base64MimeType(b64);
     if (!mimeInfo || mimeInfo.includes('image')) {
-      //non matter what, convert to webp, resize + autoscale to width 512 px
+      // Convert to webp, resize + autoscale to width 512 px
       const scaledImageBuffer = await sharp(buff, { failOnError: false })
         .resize({ width: 512, height: 512 })
         .toBuffer();
       const webp = sharp(scaledImageBuffer, { failOnError: false }).webp();
-      const metadata: any = await webp.metadata();
+      const metadata = (await webp.metadata()) as any;
       const webpBase64 = (await webp.toBuffer()).toString('base64');
       return await this.page.evaluate(
         ({ webpBase64, to, metadata }) =>
