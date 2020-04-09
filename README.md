@@ -74,6 +74,20 @@ sulla.create('support').then((supportClient) => {...});
 
 <br>
 
+## Optional init options
+Sulla `create()` method third parameter can have the following optional parameters:
+
+```javascript
+create('sessionName', qrCallback, {
+  headless: true, // Headless chrome
+  devtools: false, // Open devtools by default
+  useChrome: true, // If false will use Chromium instance
+  debug: false, // Opens a debug session
+})
+```
+
+##### The type definition con be found in here: [CreateConfig.ts](https://github.com/danielcardeenas/sulla/blob/affd816d83cc065bf953c9cc5328d935e9fc04c8/src/config/create-config.ts)
+
 ## Exporting QR code
 
 By default QR code will appear on the terminal. If you need to pass the QR
