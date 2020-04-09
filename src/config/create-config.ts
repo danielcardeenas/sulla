@@ -3,4 +3,5 @@ export interface CreateConfig {
   devtools?: boolean;
   useChrome?: boolean;
   debug?: boolean;
+  browserArgs?: string[];
 }
