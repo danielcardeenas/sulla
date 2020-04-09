@@ -11,6 +11,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/danielcardeenas/sulla)
 [![GitHub license](https://img.shields.io/github/license/danielcardeenas/sulla)](https://github.com/danielcardeenas/sulla/blob/master/LICENSE)
 [![codebeat badge](https://codebeat.co/badges/7e510d47-8689-49da-abd8-a9a29d106a2b)](https://codebeat.co/projects/github-com-danielcardeenas-sulla-master)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla?ref=badge_shield)
 
 > Sulla is a javascript library which provides a high-level API control to
 > Whatsapp so it can be configured to automatize resposes or any data that goes
@@ -427,3 +428,6 @@ discuss what you would like to change.
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla?ref=badge_large)
