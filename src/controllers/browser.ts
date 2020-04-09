@@ -45,12 +45,10 @@ async function initBrowser(
   extras = {}
 ) {
   if (options.useChrome) {
-    try {
-      const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
-      if (chromeInstalations.length) {
-        extras = { ...extras, executablePath: chromeInstalations[0] };
-      }
-    } catch (error) {
+    const chromePath = getChrome();
+    if (chromePath) {
+      extras = { ...extras, executablePath: chromePath };
+    } else {
       console.log('Chrome not found, using chromium');
       extras = {};
     }
@@ -74,4 +72,16 @@ async function getWhatsappPage(browser: Browser) {
   const pages = await browser.pages();
   console.assert(pages.length > 0);
   return pages[0];
+}
+
+/**
+ * Retrieves chrome instance path
+ */
+function getChrome() {
+  try {
+    const chromeInstalations = ChromeLauncher.Launcher.getInstallations();
+    return chromeInstalations[0];
+  } catch (error) {
+    return undefined;
+  }
 }

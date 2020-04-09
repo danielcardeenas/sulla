@@ -12,15 +12,17 @@ const spinner = ora();
 export async function create(
   session = 'session',
   catchQR?: (qrCode: string) => void,
-  options: CreateConfig = {
+  options?: CreateConfig
+) {
+  const defaultOptions: CreateConfig = {
     headless: true,
     devtools: false,
     useChrome: true,
     debug: false,
-  }
-) {
+  };
+
   spinner.start('Initializing whatsapp');
-  let waPage = await initWhatsapp(session, options);
+  let waPage = await initWhatsapp(session, { ...defaultOptions, ...options });
   spinner.succeed();
 
   spinner.start('Authenticating');
