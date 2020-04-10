@@ -47,10 +47,10 @@
 // import { create, Whatsapp } from 'sulla';
 const sulla = require('sulla');
 
-sulla.create().then(client => start(client));
+sulla.create().then((client) => start(client));
 
 function start(client) {
-  client.onMessage(message => {
+  client.onMessage((message) => {
     if (message.body === 'Hi') {
       client.sendText(message.from, '👋 Hello from sulla!');
     }
@@ -86,7 +86,9 @@ create('sessionName', qrCallback, {
   headless: true, // Headless chrome
   devtools: false, // Open devtools by default
   useChrome: true, // If false will use Chromium instance
-  debug: false // Opens a debug session
+  debug: false, // Opens a debug session
+  logQR: true // Logs QR automatically in terminal
+  browserArgs: [''] // Parameters to be added into the chrome browser instance
 });
 ```
 
@@ -101,8 +103,12 @@ somewhere else heres how:
 const fs = require('fs');
 
 // Second create() parameter is the QR callback
-sulla.create('session-marketing', qrCode => {
-  exportQR(qrCode, 'marketing-qr.png');
+sulla.create('session-marketing', (base64Qr, asciiQR) => {
+  // To log the QR in the terminal
+  console.log(asciiQR);
+
+  // To write it somewhere else in a file
+  exportQR(base64Qr, 'marketing-qr.png');
 });
 
 // Writes QR in specified path
@@ -160,7 +166,7 @@ await client.sendImage(
 // Send @tagged message
 await client.sendMentioned(chatId, 'Hello @5218113130740 and @5218243160777!', [
   '5218113130740',
-  '5218243160777'
+  '5218243160777',
 ]);
 
 // Reply to a message
@@ -336,7 +342,7 @@ There are some tricks for a better usage of sulla.
 ```javascript
 // In case of being logged out of whatsapp web
 // Force it to keep the current session
-client.onStateChange(state => {
+client.onStateChange((state) => {
   if (state === 'UNLAUNCHED') {
     client.useHere();
   }

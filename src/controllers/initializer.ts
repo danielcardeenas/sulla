@@ -27,6 +27,7 @@ export async function create(
     useChrome: true,
     debug: false,
     logQR: true,
+    browserArgs: [''],
   };
 
   // Check for updates if needed
