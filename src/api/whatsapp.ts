@@ -13,6 +13,14 @@ export class Whatsapp extends ControlsLayer {
   }
 
   /**
+   * Get the puppeteer page instance
+   * @returns The Whatsapp page
+   */
+  get waPage(): Page {
+    return this.page;
+  }
+
+  /**
    * Clicks on 'use here' button (When it get unlaunched)
    * This method tracks the class of the button
    * Whatsapp web might change this class name over the time
