@@ -1,10 +1,10 @@
 import { readFileSync } from 'fs';
 import latestVersion from 'latest-version';
 import { Whatsapp } from '../api/whatsapp';
-import { CreateConfig } from '../config/create-config';
+import { CreateConfig, defaultOptions } from '../config/create-config';
+import { upToDate } from '../utils/semver';
 import { isAuthenticated, isInsideChat, retrieveQR } from './auth';
 import { initWhatsapp, injectApi } from './browser';
-import { upToDate } from '../utils/semver';
 import chalk = require('chalk');
 import boxen = require('boxen');
 import Spinnies = require('spinnies');
@@ -21,14 +21,6 @@ export async function create(
   options?: CreateConfig
 ) {
   const spinnies = new Spinnies();
-  const defaultOptions: CreateConfig = {
-    headless: true,
-    devtools: false,
-    useChrome: true,
-    debug: false,
-    logQR: true,
-    browserArgs: [''],
-  };
 
   // Check for updates if needed
   if (!updatesChecked) {
@@ -48,8 +40,9 @@ export async function create(
 
   // If not authenticated, show QR and wait for scan
   if (authenticated) {
+    spinnies.succeed(`${session}-auth`, { text: 'Authenticated' });
   } else {
-    spinnies.update(`${session}`, {
+    spinnies.update(`${session}-auth`, {
       text: `Authenticate to continue`,
     });
 
@@ -68,9 +61,9 @@ export async function create(
     spinnies.succeed(`${session}`, { text: 'Authenticated' });
   }
 
-  console.info('Injecting api');
+  spinnies.add(`${session}-inject`, { text: 'Injecting api...' });
   waPage = await injectApi(waPage);
-  console.log('Whatsapp is ready');
+  spinnies.succeed(`${session}-inject`, { text: 'Injecting api' });
 
   if (options.debug) {
     const debugURL = `http://localhost:${readFileSync(
