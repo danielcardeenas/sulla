@@ -98,8 +98,8 @@ function checkSullaVersion(spinnies) {
  */
 function logUpdateAvailable(current: string, latest: string) {
   // prettier-ignore
-  const newVersionLog = 
-  `There is a new version of ${chalk.bold(`sulla`)} ${chalk.gray(current)} ➜  ${chalk.bold.green(latest)}\n` + 
+  const newVersionLog =
+  `There is a new version of ${chalk.bold(`sulla`)} ${chalk.gray(current)} ➜  ${chalk.bold.green(latest)}\n` +
   `Update your package by running:\n\n` +
   `${chalk.bold('\>')} ${chalk.blueBright('npm update sulla')}`;
 
