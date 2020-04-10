@@ -219,6 +219,37 @@ await client.stopTyping(chatId);
 await client.setChatState(chatId, 0 | 1 | 2);
 ```
 
+### Retrieving data
+
+```javascript
+// Retrieve contacts
+const contacts = await client.getAllContacts();
+
+// Retrieve all messages in chat
+const allMessages = await client.loadAndGetAllMessagesInChat(chatId);
+
+// Retrieve contact status
+const status = await client.getStatus(contactId);
+
+// Retrieve user profile
+const user = await client.getNumberProfile(contactId);
+
+// Retrieve all unread message
+const messages = await client.getAllUnreadMessages();
+
+// Retrieve all chats
+const chats = await client.getAllChats();
+
+// Retrieve all groups
+const chats = await client.getAllGroups();
+
+// Retrieve profile fic (as url)
+const url = await client.getProfilePicFromServer(chatId);
+
+// Retrieve chat/conversation
+const chat = await client.getChat(chatId);
+```
+
 ### Group functions
 
 ```javascript

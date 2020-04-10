@@ -20,6 +20,6 @@ export async function loadAllEarlierMessages(id, done) {
  * @param {Funciton} done Optional callback
  */
 export function asyncLoadAllEarlierMessages(id, done) {
-  done();
   loadAllEarlierMessages(id);
+  done();
 }

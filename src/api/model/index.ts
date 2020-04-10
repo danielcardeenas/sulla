@@ -10,3 +10,4 @@ export { HostDevice } from './host-device';
 export { LiveLocation } from './live-location';
 export { ContactStatus } from './contact-status';
 export { GroupCreation } from './group-creation';
+export { WhatsappProfile } from './whatsapp-profile';

@@ -10,6 +10,7 @@ export {
   LiveLocation,
   PartialMessage,
   ParticipantEvent,
+  WhatsappProfile,
 } from './api/model';
 export {
   AckType,

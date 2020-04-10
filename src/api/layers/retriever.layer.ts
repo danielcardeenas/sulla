@@ -5,6 +5,7 @@ import {
   ContactStatus,
   Message,
   PartialMessage,
+  WhatsappProfile,
 } from '../model';
 import { SenderLayer } from './sender.layer';
 
@@ -17,12 +18,10 @@ declare module WAPI {
   const getAllContacts: () => Contact[];
   const getChatById: (contactId: string) => Chat;
   const getChat: (contactId: string) => Chat;
-  const getProfilePicFromServer: (chatId: string) => any;
+  const getProfilePicFromServer: (chatId: string) => string;
   const loadEarlierMessages: (contactId: string) => Message[];
   const getStatus: (contactId: string) => ContactStatus;
-  const asyncLoadAllEarlierMessages: (contactId: string) => void;
-  const loadAllEarlierMessages: (contactId: string) => void;
-  const getNumberProfile: (contactId: string) => any;
+  const getNumberProfile: (contactId: string) => WhatsappProfile;
   const getUnreadMessages: (
     includeMe: boolean,
     includeNotifications: boolean,
@@ -50,7 +49,7 @@ export class RetrieverLayer extends SenderLayer {
    * Retrieves all chats
    * @returns array of [Chat]
    */
-  public async getAllChatsgetAllChats(withNewMessageOnly = false) {
+  public async getAllChats(withNewMessageOnly = false) {
     if (withNewMessageOnly) {
       return this.page.evaluate(() => WAPI.getAllChatsWithNewMsg());
     } else {
@@ -121,18 +120,16 @@ export class RetrieverLayer extends SenderLayer {
    * Retrieves chat object of given contact id
    * @param contactId
    * @returns contact detial as promise
+   * @deprecated
    */
   public async getChat(contactId: string) {
-    return this.page.evaluate(
-      (contactId) => WAPI.getChat(contactId),
-      contactId
-    );
+    return this.getChatById(contactId);
   }
 
   /**
    * Retrieves chat picture
    * @param chatId Chat id
-   * @returns Url of the chat picture or undefined if there is no picture for the chat.
+   * @returns url of the chat picture or undefined if there is no picture for the chat.
    */
   public async getProfilePicFromServer(chatId: string) {
     return this.page.evaluate(
@@ -145,6 +142,7 @@ export class RetrieverLayer extends SenderLayer {
    * Load more messages in chat object from server. Use this in a while loop
    * @param contactId
    * @returns contact detial as promise
+   * @deprecated
    */
   public async loadEarlierMessages(contactId: string) {
     return this.page.evaluate(
@@ -160,30 +158,6 @@ export class RetrieverLayer extends SenderLayer {
   public async getStatus(contactId: string) {
     return this.page.evaluate(
       (contactId) => WAPI.getStatus(contactId),
-      contactId
-    );
-  }
-
-  /**
-   * Load all messages in chat object from server.
-   * @param contactId
-   * @returns contact detial as promise
-   */
-  public async asyncLoadAllEarlierMessages(contactId: string) {
-    return this.page.evaluate(
-      (contactId) => WAPI.asyncLoadAllEarlierMessages(contactId),
-      contactId
-    );
-  }
-
-  /**
-   * Load all messages in chat object from server.
-   * @param contactId
-   * @returns contact detial as promise
-   */
-  public async loadAllEarlierMessages(contactId: string) {
-    return this.page.evaluate(
-      (contactId) => WAPI.loadAllEarlierMessages(contactId),
       contactId
     );
   }
@@ -206,6 +180,7 @@ export class RetrieverLayer extends SenderLayer {
    * @param includeNotifications
    * @param useUnreadCount
    * @returns any
+   * @deprecated
    */
   public async getUnreadMessages(
     includeMe: boolean,
@@ -230,13 +205,15 @@ export class RetrieverLayer extends SenderLayer {
   /**
    * Retrieves all new messages (where isNewMsg is true)
    * @returns List of messages
+   * @deprecated Use getAllUnreadMessages
    */
   public async getAllNewMessages() {
     return this.page.evaluate(() => WAPI.getAllNewMessages());
   }
 
   /**
-   * Retrieves all Messages in a chat
+   * Retrieves all messages already loaded in a chat
+   * For loading every message use loadAndGetAllMessagesInChat
    * @param chatId, the chat to get the messages from
    * @param includeMe, include my own messages? boolean
    * @param includeNotifications
@@ -263,8 +240,8 @@ export class RetrieverLayer extends SenderLayer {
    */
   public async loadAndGetAllMessagesInChat(
     chatId: string,
-    includeMe: boolean,
-    includeNotifications: boolean
+    includeMe = false,
+    includeNotifications = false
   ) {
     return await this.page.evaluate(
       ({ chatId, includeMe, includeNotifications }) =>
