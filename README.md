@@ -96,7 +96,7 @@ create('sessionName', qrCallback, {
 });
 ```
 
-##### The type definition con be found in here: [CreateConfig.ts](https://github.com/danielcardeenas/sulla/blob/affd816d83cc065bf953c9cc5328d935e9fc04c8/src/config/create-config.ts)
+##### The type definition con be found in here: [CreateConfig.ts](https://github.com/danielcardeenas/sulla/blob/master/src/config/create-config.ts)
 
 ## Exporting QR code
 
