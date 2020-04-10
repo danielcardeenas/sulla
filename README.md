@@ -346,8 +346,15 @@ There are some tricks for a better usage of sulla.
 ```javascript
 // In case of being logged out of whatsapp web
 // Force it to keep the current session
+// State change
 client.onStateChange((state) => {
-  if (state === 'UNLAUNCHED') {
+  console.log(state);
+  const conflits = [
+    sulla.SocketState.CONFLICT,
+    sulla.SocketState.UNPAIRED,
+    sulla.SocketState.UNLAUNCHED,
+  ];
+  if (conflits.includes(state)) {
     client.useHere();
   }
 });
