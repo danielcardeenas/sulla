@@ -10,6 +10,7 @@ import boxen = require('boxen');
 import Spinnies = require('spinnies');
 const { version } = require('../../package.json');
 
+// Global
 let updatesChecked = false;
 
 /**
@@ -54,7 +55,7 @@ export async function create(
     }
 
     if (mergedOptions.logQR) {
-      console.log(`Scan QR for: ${session}`);
+      console.log(`Scan QR for: ${session}                `);
       console.log(asciiQR);
     }
 

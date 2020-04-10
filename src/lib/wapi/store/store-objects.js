@@ -251,4 +251,9 @@ export const storeObjects = [
     conditions: (module) =>
       module.default && module.default.encryptAndUpload ? module.default : null,
   },
+  {
+    id: 'Cmd',
+    conditions: (module) =>
+      module.default && module.default.openChatFromUnread ? module : null,
+  },
 ];
