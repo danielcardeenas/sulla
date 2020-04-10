@@ -96,7 +96,7 @@ create('sessionName', qrCallback, {
 });
 ```
 
-##### The type definition con be found in here: [CreateConfig.ts](https://github.com/danielcardeenas/sulla/blob/affd816d83cc065bf953c9cc5328d935e9fc04c8/src/config/create-config.ts)
+##### The type definition con be found in here: [CreateConfig.ts](https://github.com/danielcardeenas/sulla/blob/master/src/config/create-config.ts)
 
 ## Exporting QR code
 
@@ -346,8 +346,15 @@ There are some tricks for a better usage of sulla.
 ```javascript
 // In case of being logged out of whatsapp web
 // Force it to keep the current session
+// State change
 client.onStateChange((state) => {
-  if (state === 'UNLAUNCHED') {
+  console.log(state);
+  const conflits = [
+    sulla.SocketState.CONFLICT,
+    sulla.SocketState.UNPAIRED,
+    sulla.SocketState.UNLAUNCHED,
+  ];
+  if (conflits.includes(state)) {
     client.useHere();
   }
 });
