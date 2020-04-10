@@ -26,6 +26,10 @@
 
 #### Changelog:
 
+> ☑️ Self check for updates
+>
+> ☑️ More parameters to `create()`
+>
 > ☑️ Added d.ts types comments for friendlier development
 >
 > ☑️ Fixed video send, fixed optional `create()` parameters
@@ -76,7 +80,7 @@ sulla.create('support').then((supportClient) => {...});
 
 <br>
 
-## Optional init options
+## Optional create parameters
 
 Sulla `create()` method third parameter can have the following optional
 parameters:
