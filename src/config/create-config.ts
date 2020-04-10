@@ -6,3 +6,12 @@ export interface CreateConfig {
   browserArgs?: string[];
   logQR?: boolean;
 }
+
+export const defaultOptions: CreateConfig = {
+  headless: true,
+  devtools: false,
+  useChrome: true,
+  debug: false,
+  logQR: true,
+  browserArgs: [''],
+};
