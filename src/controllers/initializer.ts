@@ -7,45 +7,67 @@ import { initWhatsapp, injectApi } from './browser';
 import { upToDate } from '../utils/semver';
 import chalk = require('chalk');
 import boxen = require('boxen');
-
+import Spinnies = require('spinnies');
 const { version } = require('../../package.json');
+
+let updatesChecked = false;
 
 /**
  * Should be called to initialize whatsapp client
  */
 export async function create(
   session = 'session',
-  catchQR?: (qrCode: string) => void,
+  catchQR?: (qrCode: string, asciiQR: string) => void,
   options?: CreateConfig
 ) {
+  const spinnies = new Spinnies();
   const defaultOptions: CreateConfig = {
     headless: true,
     devtools: false,
     useChrome: true,
     debug: false,
+    logQR: true,
   };
 
-  checkSullaVersion();
-  let waPage = await initWhatsapp(session, { ...defaultOptions, ...options });
+  // Check for updates if needed
+  if (!updatesChecked) {
+    spinnies.add('sulla-version-spinner', { text: 'Checking for updates...' });
+    checkSullaVersion(spinnies);
+    updatesChecked = true;
+  }
 
-  console.log('Initializing sulla');
-  console.log('Authenticating');
+  // Initialize whatsapp
+  spinnies.add(`${session}`, { text: 'Creating whatsapp instace...' });
+
+  const mergedOptions = { ...defaultOptions, ...options };
+  let waPage = await initWhatsapp(session, mergedOptions);
+
+  spinnies.update(`${session}`, { text: 'Authenticating...' });
   const authenticated = await isAuthenticated(waPage);
 
   // If not authenticated, show QR and wait for scan
   if (authenticated) {
   } else {
-    console.log('Authenticate to continue');
+    spinnies.update(`${session}`, {
+      text: `Authenticate to continue`,
+    });
+
     const { data, asciiQR } = await retrieveQR(waPage);
     if (catchQR) {
-      catchQR(data);
+      catchQR(data, asciiQR);
+    }
+
+    if (mergedOptions.logQR) {
+      console.log(`Scan QR for: ${session}`);
+      console.log(asciiQR);
     }
 
     // Wait til inside chat
     await isInsideChat(waPage).toPromise();
+    spinnies.succeed(`${session}`, { text: 'Authenticated' });
   }
 
-  console.log('Injecting api');
+  console.info('Injecting api');
   waPage = await injectApi(waPage);
   console.log('Whatsapp is ready');
 
@@ -62,11 +84,13 @@ export async function create(
 /**
  * Checs for a new versoin of sulla and logs
  */
-function checkSullaVersion() {
+function checkSullaVersion(spinnies) {
   latestVersion('sulla').then((latest) => {
     if (!upToDate(version, latest)) {
       logUpdateAvailable(version, latest);
     }
+
+    spinnies.succeed('sulla-version-spinner', { text: 'Checking for updates' });
   });
 }
 
