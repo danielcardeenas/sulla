@@ -4,6 +4,7 @@ import { Browser, Page } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import { CreateConfig } from '../config/create-config';
 import { puppeteerConfig } from '../config/puppeteer.config';
+import chalk = require('chalk');
 import StealthPlugin = require('puppeteer-extra-plugin-stealth');
 
 export async function initWhatsapp(session: string, options: CreateConfig) {

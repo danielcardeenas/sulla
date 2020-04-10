@@ -6,8 +6,8 @@
  * @param {Function} done Optional callback
  */
 export function deleteMessages(chatId, messageArray, onlyLocal, done) {
-  var userId = new Store.WidFactory.createWid(chatId);
-  let conversation = WAPI.getChat(userId);
+  const userId = new Store.WidFactory.createWid(chatId);
+  const conversation = WAPI.getChat(userId);
   if (!conversation) {
     if (done !== undefined) {
       done(false);

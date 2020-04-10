@@ -10,6 +10,7 @@ import boxen = require('boxen');
 import Spinnies = require('spinnies');
 const { version } = require('../../package.json');
 
+// Global
 let updatesChecked = false;
 
 /**
@@ -54,7 +55,7 @@ export async function create(
     }
 
     if (mergedOptions.logQR) {
-      console.log(`Scan QR for: ${session}`);
+      console.log(`Scan QR for: ${session}                `);
       console.log(asciiQR);
     }
 
@@ -67,7 +68,7 @@ export async function create(
   waPage = await injectApi(waPage);
   spinnies.succeed(`${session}-inject`, { text: 'Injecting api' });
 
-  if (options.debug) {
+  if (mergedOptions.debug) {
     const debugURL = `http://localhost:${readFileSync(
       `./${session}/DevToolsActivePort`
     ).slice(0, -54)}`;
