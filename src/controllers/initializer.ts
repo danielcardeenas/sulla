@@ -68,7 +68,7 @@ export async function create(
   waPage = await injectApi(waPage);
   spinnies.succeed(`${session}-inject`, { text: 'Injecting api' });
 
-  if (options.debug) {
+  if (mergedOptions.debug) {
     const debugURL = `http://localhost:${readFileSync(
       `./${session}/DevToolsActivePort`
     ).slice(0, -54)}`;
