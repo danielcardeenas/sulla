@@ -30,16 +30,18 @@ export async function create(
   }
 
   // Initialize whatsapp
-  spinnies.add(`${session}`, { text: 'Creating whatsapp instace...' });
+  spinnies.add(`${session}-auth`, { text: 'Creating whatsapp instace...' });
 
   const mergedOptions = { ...defaultOptions, ...options };
   let waPage = await initWhatsapp(session, mergedOptions);
 
-  spinnies.update(`${session}`, { text: 'Authenticating...' });
+  spinnies.update(`${session}-auth`, { text: 'Authenticating...' });
   const authenticated = await isAuthenticated(waPage);
 
   // If not authenticated, show QR and wait for scan
   if (authenticated) {
+    // Wait til inside chat
+    await isInsideChat(waPage).toPromise();
     spinnies.succeed(`${session}-auth`, { text: 'Authenticated' });
   } else {
     spinnies.update(`${session}-auth`, {
@@ -58,7 +60,7 @@ export async function create(
 
     // Wait til inside chat
     await isInsideChat(waPage).toPromise();
-    spinnies.succeed(`${session}`, { text: 'Authenticated' });
+    spinnies.succeed(`${session}-auth`, { text: 'Authenticated' });
   }
 
   spinnies.add(`${session}-inject`, { text: 'Injecting api...' });
