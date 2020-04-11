@@ -8,6 +8,7 @@ export {
   HostDevice,
   Id,
   LiveLocation,
+  Message,
   PartialMessage,
   ParticipantEvent,
   WhatsappProfile,
