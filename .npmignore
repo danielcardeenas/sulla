@@ -6,3 +6,10 @@ session-*
 assets
 img
 docs
+CONTRIBUTING.md
+UPDATES.md
+app.ts
+app.js
+app2.js
+LICENSE
+CHANGELOG.md
