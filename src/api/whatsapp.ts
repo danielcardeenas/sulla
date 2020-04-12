@@ -1,13 +1,13 @@
 import { Page } from 'puppeteer';
 import { decrypt } from './helpers/decrypt';
-import { GroupLayer } from './layers/group.layer';
+import { ControlsLayer } from './layers/controls.layer';
 import { Message } from './model';
 
 declare module WAPI {
   const arrayBufferToBase64: (buffer: ArrayBuffer) => string;
 }
 
-export class Whatsapp extends GroupLayer {
+export class Whatsapp extends ControlsLayer {
   constructor(public page: Page) {
     super(page);
   }

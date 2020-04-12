@@ -19,7 +19,7 @@ export async function initWhatsapp(session: string, options: CreateConfig) {
 }
 
 export async function injectApi(page: Page) {
-  page.waitForFunction(() => {
+  await page.waitForFunction(() => {
     // @ts-ignore
     return webpackJsonp !== undefined;
   });
@@ -31,6 +31,12 @@ export async function injectApi(page: Page) {
     path: require.resolve(
       path.join(__dirname, '../lib/middleware', 'middleware.js')
     ),
+  });
+
+  // Make sure WAPI is initialized
+  await page.waitForFunction(() => {
+    // @ts-ignore
+    return !!WAPI.getWAVersion;
   });
 
   return page;

@@ -77,6 +77,8 @@ import {
   startTyping,
   stopTyping,
   unblockContact,
+  openChat,
+  openChatAt,
 } from './functions';
 import {
   base64ToFile,
@@ -172,6 +174,8 @@ window.WAPI.stopTyping = stopTyping;
 window.WAPI.sendLocation = sendLocation;
 window.WAPI.blockContact = blockContact;
 window.WAPI.unblockContact = unblockContact;
+window.WAPI.openChat = openChat;
+window.WAPI.openChatAt = openChatAt;
 
 // Retrieving functions
 window.WAPI.getAllContacts = getAllContacts;

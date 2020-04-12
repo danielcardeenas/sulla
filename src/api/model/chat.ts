@@ -24,26 +24,6 @@ export interface Chat {
   lastSeen: null;
 }
 
-export interface Contact {
-  id: Id;
-  name: string;
-  shortName: string;
-  pushname: string;
-  type: string;
-  isBusiness: boolean;
-  isEnterprise: boolean;
-  statusMute: boolean;
-  labels: any[];
-  formattedName: string;
-  isMe: boolean;
-  isMyContact: boolean;
-  isPSA: boolean;
-  isUser: boolean;
-  isWAContact: boolean;
-  profilePicThumbObj: ProfilePicThumbObj;
-  msgs: null;
-}
-
 export interface ProfilePicThumbObj {
   eurl: string;
   id: Id;
