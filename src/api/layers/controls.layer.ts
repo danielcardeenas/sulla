@@ -1,5 +1,6 @@
 import { Page } from 'puppeteer';
 import { GroupLayer } from './group.layer';
+import { UILayer } from './ui.layer';
 
 declare module WAPI {
   const deleteConversation: (chatId: string) => boolean;
@@ -11,7 +12,7 @@ declare module WAPI {
   ) => any;
 }
 
-export class ControlsLayer extends GroupLayer {
+export class ControlsLayer extends UILayer {
   constructor(page: Page) {
     super(page);
   }

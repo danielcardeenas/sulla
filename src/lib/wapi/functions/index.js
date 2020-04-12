@@ -77,3 +77,4 @@ export { removeParticipant } from './remove-participant';
 export { addParticipant } from './add-participant';
 export { promoteParticipant } from './promote-participant';
 export { demoteParticipant } from './demote-participant';
+export { openChat, openChatAt } from './open-chat';
