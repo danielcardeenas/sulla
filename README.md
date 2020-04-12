@@ -25,7 +25,7 @@
 > will use integrated Chromium instance
 
 #### Changelog:
-> ☑️ Add `openChat()` function
+> ☑️ Add `openChat()` function with UI Layer
 >
 > ☑️ Self check for updates
 >
