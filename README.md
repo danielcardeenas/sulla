@@ -25,6 +25,8 @@
 > will use integrated Chromium instance
 
 #### Changelog:
+> ☑️ Add `refreshQR` option in `create()`
+>
 > ☑️ Add `openChat()` function with UI Layer
 >
 > ☑️ Self check for updates
@@ -94,6 +96,7 @@ create('sessionName', qrCallback, {
   debug: false, // Opens a debug session
   logQR: true // Logs QR automatically in terminal
   browserArgs: [''] // Parameters to be added into the chrome browser instance
+  refreshQR: 15000, // Will refresh QR every 15 seconds, 0 will load QR once. Default is 30 seconds
 });
 ```
 
