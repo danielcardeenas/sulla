@@ -15,5 +15,5 @@ export const defaultOptions: CreateConfig = {
   debug: false,
   logQR: true,
   browserArgs: [''],
-  refreshQR: 10000,
+  refreshQR: 30000,
 };
