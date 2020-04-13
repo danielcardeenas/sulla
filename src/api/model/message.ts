@@ -6,6 +6,7 @@ export interface Message {
   notifyName: string;
   from: string;
   to: string;
+  author: string;
   self: string;
   ack: number;
   invis: boolean;

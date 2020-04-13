@@ -5,6 +5,7 @@ export interface CreateConfig {
   debug?: boolean;
   browserArgs?: string[];
   logQR?: boolean;
+  refreshQR?: number;
 }
 
 export const defaultOptions: CreateConfig = {
@@ -14,4 +15,5 @@ export const defaultOptions: CreateConfig = {
   debug: false,
   logQR: true,
   browserArgs: [''],
+  refreshQR: 10000,
 };

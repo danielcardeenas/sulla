@@ -1,5 +1,8 @@
 import { readFileSync } from 'fs';
 import latestVersion from 'latest-version';
+import { Page } from 'puppeteer';
+import { from, interval, timer } from 'rxjs';
+import { map, takeUntil, tap, delay, switchMap } from 'rxjs/operators';
 import { Whatsapp } from '../api/whatsapp';
 import { CreateConfig, defaultOptions } from '../config/create-config';
 import { upToDate } from '../utils/semver';
@@ -49,14 +52,18 @@ export async function create(
       text: `Authenticate to continue`,
     });
 
-    const { data, asciiQR } = await retrieveQR(waPage);
-    if (catchQR) {
-      catchQR(data, asciiQR);
-    }
+    if (mergedOptions.refreshQR <= 0) {
+      const { data, asciiQR } = await retrieveQR(waPage);
+      if (catchQR) {
+        catchQR(data, asciiQR);
+      }
 
-    if (mergedOptions.logQR) {
-      console.log(`Scan QR for: ${session}                `);
-      console.log(asciiQR);
+      if (mergedOptions.logQR) {
+        console.log(`Scan QR for: ${session}                `);
+        console.log(asciiQR);
+      }
+    } else {
+      grabQRUntilInside(waPage, mergedOptions, session, catchQR);
     }
 
     // Wait til inside chat
@@ -76,6 +83,30 @@ export async function create(
   }
 
   return new Whatsapp(waPage);
+}
+
+function grabQRUntilInside(
+  waPage: Page,
+  options: CreateConfig,
+  session: string,
+  catchQR: (qrCode: string, asciiQR: string) => void
+) {
+  const isInside = isInsideChat(waPage);
+  timer(0, options.refreshQR)
+    .pipe(
+      takeUntil(isInside),
+      switchMap(() => retrieveQR(waPage))
+    )
+    .subscribe(({ data, asciiQR }) => {
+      if (catchQR) {
+        catchQR(data, asciiQR);
+      }
+      if (options.logQR) {
+        console.clear();
+        console.log(`Scan QR for: ${session}                `);
+        console.log(asciiQR);
+      }
+    });
 }
 
 /**
