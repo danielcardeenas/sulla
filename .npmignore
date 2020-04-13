@@ -13,3 +13,6 @@ app.js
 app2.js
 LICENSE
 CHANGELOG.md
+.codebeatignore
+.prettierignore
+.prettierrc
