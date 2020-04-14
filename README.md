@@ -476,7 +476,7 @@ lot of time to this project so please consider checking out forked versions of
 sulla where other developers can dedicate more time and support to it.
 
 ## Thanks
-A lot of my code is based on the research done by the following repos which are worth giving a look
+Some of my code is based on the research done by the following repos which are worth giving a look
 
 > https://github.com/vasani-arpit/WBOT
 > 
