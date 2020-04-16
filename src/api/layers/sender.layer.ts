@@ -126,6 +126,27 @@ export class SenderLayer extends ListenerLayer {
   }
 
   /**
+   * Sends image message
+   * @param to Chat id
+   * @param imgBase64
+   * @param filename
+   * @param caption
+   */
+  public async sendImageFromBase64(
+    to: string,
+    base64: string,
+    filename: string,
+    caption?: string
+  ) {
+    return this.page.evaluate(
+      ({ to, base64, filename, caption }) => {
+        WAPI.sendImage(base64, to, filename, caption);
+      },
+      { to, base64, filename, caption }
+    );
+  }
+
+  /**
    * Sends message with thumbnail
    * @param thumb
    * @param url
