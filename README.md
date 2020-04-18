@@ -18,7 +18,7 @@
 > trough Whatsapp effortlessly.
 >
 > It is built using [puppeteer](https://github.com/GoogleChrome/puppeteer) and
-> based on
+> it begin based on
 > [this python wrapper](https://github.com/mukulhase/WebWhatsapp-Wrapper)
 >
 > By deafult sulla will try to use Google Chrome driver if installed, if not, it
@@ -474,17 +474,6 @@ As of version `2.3.5` it seems that sulla has reached a very rich and stable
 functionality and architecture. As much as I would love to, I cannot dedicate a
 lot of time to this project so please consider checking out forked versions of
 sulla where other developers can dedicate more time and support to it.
-
-## Thanks
-Some of my code is based on the research done by the following repos which are worth giving a look
-
-> https://github.com/vasani-arpit/WBOT
-> 
-> https://github.com/alfred82santa/whalesong
->
-> https://github.com/smashah/sulla/
->
-> https://github.com/mukulhase/WebWhatsapp-Wrapper
 
 ## Maintainers
 
