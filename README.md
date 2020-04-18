@@ -158,6 +158,7 @@ available can be found in [here](/src/api/layers) and
 [here](/src/lib/wapi/functions)
 
 ### Chatting
+##### Here, `chatId` could be `<phoneNuber>@c.us` or `<phoneNumber>-<groupId>@c.us`
 
 ```javascript
 // Send basic text
