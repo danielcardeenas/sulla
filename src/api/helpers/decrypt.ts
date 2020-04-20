@@ -47,7 +47,7 @@ function generateFile(
 function expandDerivation(mediaType: string, mediaKeyBase64: string) {
   const options: hkdf.Options = {
     salt: new Uint8Array(32) as any,
-    info: `WhatsApp ${MediaType[mediaType.toUpperCase()]} Keys`,
+    info: `WhatsApp ${mediaType && MediaType[mediaType.toUpperCase()] || 'Unknown'} Keys`,
     hash: 'sha256',
   };
 
