@@ -23,3 +23,4 @@ export {
 } from './api/model/enum';
 export { Whatsapp } from './api/whatsapp';
 export { create } from './controllers/initializer';
+export { events } from './controllers/events';
