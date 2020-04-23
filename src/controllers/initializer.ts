@@ -11,6 +11,7 @@ import { initWhatsapp, injectApi } from './browser';
 import chalk = require('chalk');
 import boxen = require('boxen');
 import Spinnies = require('spinnies');
+import { events } from './events';
 const { version } = require('../../package.json');
 
 // Global
@@ -39,6 +40,19 @@ export async function create(
   const mergedOptions = { ...defaultOptions, ...options };
   let waPage = await initWhatsapp(session, mergedOptions);
 
+  // emitted when page crashes
+  waPage.on('error', function (err) {
+    events.emit('error', err);
+    // TODO: Should we do something here to handle the page crash?
+  });
+
+  // emitted when an uncaught exception happens within the page.
+  waPage.on('pageerror', function (err) {
+    events.emit('pageError', err);
+  });
+
+  events.emit('initialized', waPage);
+
   spinnies.update(`${session}-auth`, { text: 'Authenticating...' });
   const authenticated = await isAuthenticated(waPage);
 
@@ -47,6 +61,7 @@ export async function create(
     // Wait til inside chat
     await isInsideChat(waPage).toPromise();
     spinnies.succeed(`${session}-auth`, { text: 'Authenticated' });
+    events.emit('authenticated');
   } else {
     spinnies.update(`${session}-auth`, {
       text: `Authenticate to continue`,
@@ -54,6 +69,7 @@ export async function create(
 
     if (mergedOptions.refreshQR <= 0) {
       const { data, asciiQR } = await retrieveQR(waPage);
+      events.emit('qrCode', data, asciiQR);
       if (catchQR) {
         catchQR(data, asciiQR);
       }
@@ -69,6 +85,7 @@ export async function create(
     // Wait til inside chat
     await isInsideChat(waPage).toPromise();
     spinnies.succeed(`${session}-auth`, { text: 'Authenticated' });
+    events.emit('authenticated');
   }
 
   spinnies.add(`${session}-inject`, { text: 'Injecting api...' });
@@ -129,10 +146,10 @@ function checkSullaVersion(spinnies) {
  */
 function logUpdateAvailable(current: string, latest: string) {
   // prettier-ignore
-  const newVersionLog = 
-  `There is a new version of ${chalk.bold(`sulla`)} ${chalk.gray(current)} ➜  ${chalk.bold.green(latest)}\n` + 
-  `Update your package by running:\n\n` +
-  `${chalk.bold('\>')} ${chalk.blueBright('npm update sulla')}`;
+  const newVersionLog =
+    `There is a new version of ${chalk.bold(`sulla`)} ${chalk.gray(current)} ➜  ${chalk.bold.green(latest)}\n` +
+    `Update your package by running:\n\n` +
+    `${chalk.bold('\>')} ${chalk.blueBright('npm update sulla')}`;
 
   console.log(boxen(newVersionLog, { padding: 1 }));
   console.log(
