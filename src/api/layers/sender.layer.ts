@@ -29,6 +29,12 @@ declare module WAPI {
     content: string,
     quotedMsg: string | Message
   ) => void;
+  const sendPtt: (
+    base64: string,
+    to: string,
+    filename: string,
+    caption: string
+  ) => any;
   const sendFile: (
     base64: string,
     to: string,
@@ -187,6 +193,28 @@ export class SenderLayer extends ListenerLayer {
         WAPI.reply(to, content, quotedMsg);
       },
       { to, content, quotedMsg }
+    );
+  }
+
+  /**
+   * Sends file
+   * base64 parameter should have mime type already defined
+   * @param to Chat id
+   * @param base64 base64 data
+   * @param filename
+   * @param caption
+   */
+  public async sendPttFromBase64(
+    to: string,
+    base64: string,
+    filename: string,
+    caption?: string
+  ) {
+    return this.page.evaluate(
+      ({ to, base64, filename, caption }) => {
+        WAPI.sendPtt(base64, to, filename, caption);
+      },
+      { to, base64, filename, caption }
     );
   }
 

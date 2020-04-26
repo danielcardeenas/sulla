@@ -60,6 +60,7 @@ import {
   sendChatstate,
   sendContact,
   sendFile,
+  sendPtt,
   sendImage,
   sendImageAsSticker,
   sendImageWithProduct,
@@ -157,6 +158,7 @@ window.WAPI.deleteMessages = deleteMessages;
 window.WAPI.clearChat = clearChat;
 window.WAPI.sendMessageToID = sendMessageToID;
 window.WAPI.sendImage = sendImage;
+window.WAPI.sendPtt = sendPtt;
 window.WAPI.sendFile = sendFile;
 window.WAPI.setMyName = setMyName;
 window.WAPI.setMyStatus = setMyStatus;

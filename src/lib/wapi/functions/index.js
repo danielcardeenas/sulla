@@ -52,6 +52,7 @@ export { revokeGroupInviteLink } from './revoke-invite-link';
 export { sendChatstate } from './send-chat-state';
 export { sendFile } from './send-file';
 export { sendImage } from './send-image';
+export { sendPtt } from './send-ptt';
 export { sendImageAsSticker } from './send-image-as-stricker';
 export { sendImageWithProduct } from './send-image-with-product';
 export { sendLocation } from './send-location';
