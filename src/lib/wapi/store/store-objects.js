@@ -1,7 +1,10 @@
 export const storeObjects = [
   {
     id: 'Store',
-    conditions: (module) => (module.Chat && module.Msg ? module : null),
+    conditions: (module) =>
+      module.default && module.default.Chat && module.default.Msg
+        ? module.default
+        : null,
   },
   {
     id: 'MediaCollection',
@@ -205,7 +208,7 @@ export const storeObjects = [
   {
     id: 'WidFactory',
     conditions: (module) =>
-      module.numberToWid && module.createWid && module.createWidFromWidLike
+      module.isWidlike && module.createWid && module.createWidFromWidLike
         ? module
         : null,
   },
