@@ -21,7 +21,7 @@
 > it begin based on
 > [this python wrapper](https://github.com/mukulhase/WebWhatsapp-Wrapper)
 >
-> By deafult sulla will try to use Google Chrome driver if installed, if not, it
+> By default sulla will try to use Google Chrome driver if installed, if not, it
 > will use integrated Chromium instance
 
 #### Changelog:
