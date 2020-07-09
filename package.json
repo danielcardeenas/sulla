@@ -62,7 +62,7 @@
     "prettier": "^2.0.4",
     "pretty-quick": "^2.0.1",
     "release-it": "^13.5.2",
-    "ts-loader": "^7.0.0",
+    "ts-loader": "^8.0.0",
     "typedoc": "^0.17.4",
     "typescript": "^3.8.3",
     "webpack": "^4.42.1",
