@@ -24,6 +24,11 @@
 > By default sulla will try to use Google Chrome driver if installed, if not, it
 > will use integrated Chromium instance
 
+# Deprecated
+> Project is no longer being maintained at the moment
+> To use the updated service, access this other project that maintained the development
+[Venom Project Working](https://github.com/orkestral/venom)
+
 #### Changelog:
 > ☑️ Add `refreshQR` option in `create()`
 >
