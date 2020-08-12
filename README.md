@@ -26,8 +26,8 @@
 
 # Deprecated
 > Project is no longer being maintained at the moment
-> To use the updated service, access this other project that maintained the development
-[Venom Project Working](https://github.com/orkestral/venom)
+> To use the updated service, access this other project that maintained the development Sulla
+[Venom](https://github.com/orkestral/venom)
 
 #### Changelog:
 > ☑️ Add `refreshQR` option in `create()`
