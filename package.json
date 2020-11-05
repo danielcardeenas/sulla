@@ -51,7 +51,7 @@
   "homepage": "https://github.com/danielcardeenas/sulla#readme",
   "devDependencies": {
     "@types/node": "^13.11.1",
-    "@types/puppeteer": "^2.0.1",
+    "@types/puppeteer": "^5.4.0",
     "@types/sharp": "^0.25.0",
     "auto-changelog": "^2.0.0",
     "concurrently": "^5.1.0",
