@@ -24,24 +24,6 @@
 > By default sulla will try to use Google Chrome driver if installed, if not, it
 > will use integrated Chromium instance
 
-#### Changelog:
-
-> ☑️ Add `refreshQR` option in `create()`
->
-> ☑️ Add `openChat()` function with UI Layer
->
-> ☑️ Self check for updates
->
-> ☑️ More parameters to `create()`
->
-> ☑️ Added d.ts types comments for friendlier development
->
-> ☑️ Fixed video send, fixed optional `create()` parameters
->
-> ☑️ Bundle size now just 300 kB
->
-> ☑️ Added `debug` option and `useChrome` to `create()`
-
 ## Installation
 
 ```bash
