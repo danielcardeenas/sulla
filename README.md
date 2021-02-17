@@ -21,10 +21,11 @@
 > it begin based on
 > [this python wrapper](https://github.com/mukulhase/WebWhatsapp-Wrapper)
 >
-> By deafult sulla will try to use Google Chrome driver if installed, if not, it
+> By default sulla will try to use Google Chrome driver if installed, if not, it
 > will use integrated Chromium instance
 
 #### Changelog:
+
 > ☑️ Add `refreshQR` option in `create()`
 >
 > ☑️ Add `openChat()` function with UI Layer
@@ -158,6 +159,7 @@ available can be found in [here](/src/api/layers) and
 [here](/src/lib/wapi/functions)
 
 ### Chatting
+
 ##### Here, `chatId` could be `<phoneNuber>@c.us` or `<phoneNumber>-<groupId>@c.us`
 
 ```javascript
