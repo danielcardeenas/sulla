@@ -34,7 +34,7 @@ export async function create(
   }
 
   // Initialize whatsapp
-  spinnies.add(`${session}-auth`, { text: 'Creating whatsapp instace...' });
+  spinnies.add(`${session}-auth`, { text: 'Creating whatsapp instance...' });
 
   const mergedOptions = { ...defaultOptions, ...options };
   let waPage = await initWhatsapp(session, mergedOptions);
@@ -59,7 +59,7 @@ export async function create(
       }
 
       if (mergedOptions.logQR) {
-        console.log(`Scan QR for: ${session}                `);
+        console.log(`Scan QR for: ${session}`);
         console.log(asciiQR);
       }
     } else {
@@ -103,7 +103,7 @@ function grabQRUntilInside(
       }
       if (options.logQR) {
         console.clear();
-        console.log(`Scan QR for: ${session}                `);
+        console.log(`Scan QR for: ${session}`);
         console.log(asciiQR);
       }
     });

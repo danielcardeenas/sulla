@@ -2,7 +2,6 @@ import {
   _getGroupParticipants,
   addParticipant,
   areAllMessagesLoaded,
-  asyncLoadAllEarlierMessages,
   blockContact,
   clearChat,
   createGroup,
@@ -197,7 +196,6 @@ window.WAPI.getChatById = getChatById;
 window.WAPI.getUnreadMessagesInChat = getUnreadMessagesInChat;
 window.WAPI.loadEarlierMessages = loadChatEarlierMessages;
 window.WAPI.loadAllEarlierMessages = loadAllEarlierMessages;
-window.WAPI.asyncLoadAllEarlierMessages = asyncLoadAllEarlierMessages;
 window.WAPI.areAllMessagesLoaded = areAllMessagesLoaded;
 window.WAPI.loadEarlierMessagesTillDate = loadEarlierMessagesTillDate;
 window.WAPI.getAllGroupMetadata = getAllGroupMetadata;
