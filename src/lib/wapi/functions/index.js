@@ -49,7 +49,6 @@ export { loadAllEarlierMessages } from './load-all-earlier-chat-messages';
 export { loadAndGetAllMessagesInChat } from './load-and-get-all-messages-in-chat';
 export { loadChatEarlierMessages } from './load-earlier-chat-messages';
 export { loadEarlierMessagesTillDate } from './load-earlier-messages-til-date';
-export { openChat, openChatAt } from './open-chat';
 export { processFiles } from './process-files';
 export { processMessageObj } from './process-message-object';
 export { promoteParticipant } from './promote-participant';

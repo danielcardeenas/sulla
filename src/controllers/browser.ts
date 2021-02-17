@@ -1,17 +1,21 @@
 import * as ChromeLauncher from 'chrome-launcher';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Browser, Page } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import { CreateConfig } from '../config/create-config';
 import { puppeteerConfig } from '../config/puppeteer.config';
-import chalk = require('chalk');
+import { listenNetworkAuth } from './auth';
 import StealthPlugin = require('puppeteer-extra-plugin-stealth');
+import { sleep } from '../utils/sleep';
 
 export async function initWhatsapp(session: string, options: CreateConfig) {
   const browser = await initBrowser(session, options);
   const waPage = await getWhatsappPage(browser);
+  listenNetworkAuth(waPage);
+
   await waPage.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36'
   );
 
   await waPage.goto(puppeteerConfig.whatsappUrl);
@@ -21,12 +25,26 @@ export async function initWhatsapp(session: string, options: CreateConfig) {
 export async function injectApi(page: Page) {
   await page.waitForFunction(() => {
     // @ts-ignore
-    return webpackJsonp !== undefined;
+    return webpackJsonp != undefined;
   });
+
+  // const wapi = fs.readFileSync(
+  //   path.join(__dirname, '../lib/wapi', 'wapi.js'),
+  //   'utf8'
+  // );
+  // await page.addScriptTag({ content: wapi });
+  // await page.evaluate(wapi);
+
+  // const middleware = fs.readFileSync(
+  //   path.join(__dirname, '../lib/middleware', 'middleware.js'),
+  //   'utf8'
+  // );
+  // await page.addScriptTag({ content: middleware });
 
   await page.addScriptTag({
     path: require.resolve(path.join(__dirname, '../lib/wapi', 'wapi.js')),
   });
+
   await page.addScriptTag({
     path: require.resolve(
       path.join(__dirname, '../lib/middleware', 'middleware.js')
