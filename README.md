@@ -469,7 +469,3 @@ interested please open a Pull Request.
 
 Pull requests are welcome. For major changes, please open an issue first to
 discuss what you would like to change.
-
-## License
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdanielcardeenas%2Fsulla?ref=badge_large)
