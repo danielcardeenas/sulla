@@ -27,15 +27,15 @@ lot of time to this project so please consider checking out forked versions of
 sulla where other developers can dedicate more time and support to it.
 
 Recommended actively supported sulla-based projects:
-> [**wppconnect**](https://github.com/wppconnect-team/wppconnect/) (v2)
+> [**wppconnect**](https://github.com/wppconnect-team/wppconnect/)
 > 
 > [![npm version](https://img.shields.io/npm/v/@wppconnect-team/wppconnect.svg?color=green)](https://www.npmjs.com/package/@wppconnect-team/wppconnect) [![Downloads](https://img.shields.io/npm/dm/@wppconnect-team/wppconnect.svg)](https://www.npmjs.com/package/@wppconnect-team/wppconnect) [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/wppconnect-team/wppconnect.svg)](https://isitmaintained.com/project/wppconnect-team/wppconnect 'Average time to resolve an issue')
 
-> [**open-wa/wa-automate**](https://github.com/open-wa/wa-automate-nodejs) (v1)
+> [**open-wa/wa-automate**](https://github.com/open-wa/wa-automate-nodejs)
 >
 > [![npm version](https://img.shields.io/npm/v/@open-wa/wa-automate.svg?color=green)](https://www.npmjs.com/package/@open-wa/wa-automate) [![Downloads](https://img.shields.io/npm/dm/@open-wa/wa-automate.svg)](https://www.npmjs.com/package/@open-wa/wa-automate) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/open-wa/wa-automate-nodejs.svg)](http://isitmaintained.com/project/open-wa/wa-automate-nodejs "Average time to resolve an issue")
 
-> [**orkestral/Venom**](https://github.com/orkestral/venom) (v2)
+> [**orkestral/Venom**](https://github.com/orkestral/venom)
 > 
 > [![npm version](https://img.shields.io/npm/v/venom-bot.svg?color=green)](https://www.npmjs.com/package/venom-bot)
 [![Downloads](https://img.shields.io/npm/dm/venom-bot.svg)](https://www.npmjs.com/package/venom-bot)
