@@ -16,12 +16,7 @@
 > Whatsapp so it can be configured to automatize resposes or any data that goes
 > trough Whatsapp effortlessly.
 >
-> It is built using [puppeteer](https://github.com/GoogleChrome/puppeteer) and
-> it begin based on
-> [this python wrapper](https://github.com/mukulhase/WebWhatsapp-Wrapper)
->
-> By default sulla will try to use Google Chrome driver if installed, if not, it
-> will use integrated Chromium instance
+> It is built using [puppeteer](https://github.com/GoogleChrome/puppeteer)
 
 
 ## Sulla state
@@ -32,9 +27,19 @@ lot of time to this project so please consider checking out forked versions of
 sulla where other developers can dedicate more time and support to it.
 
 Recommended actively supported sulla-based projects:
-+ [**wppconnect**](https://github.com/wppconnect-team/wppconnect/) (v2)
-+ [**open-wa/wa-automate**](https://github.com/open-wa/wa-automate-nodejs) (v1)
-+ [**orkestral/Venom**](https://github.com/orkestral/venom) (v2)
+> [**wppconnect**](https://github.com/wppconnect-team/wppconnect/) (v2)
+> 
+> [![npm version](https://img.shields.io/npm/v/@wppconnect-team/wppconnect.svg?color=green)](https://www.npmjs.com/package/@wppconnect-team/wppconnect) [![Downloads](https://img.shields.io/npm/dm/@wppconnect-team/wppconnect.svg)](https://www.npmjs.com/package/@wppconnect-team/wppconnect) [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/wppconnect-team/wppconnect.svg)](https://isitmaintained.com/project/wppconnect-team/wppconnect 'Average time to resolve an issue')
+
+> [**open-wa/wa-automate**](https://github.com/open-wa/wa-automate-nodejs) (v1)
+>
+> [![npm version](https://img.shields.io/npm/v/@open-wa/wa-automate.svg?color=green)](https://www.npmjs.com/package/@open-wa/wa-automate) [![Downloads](https://img.shields.io/npm/dm/@open-wa/wa-automate.svg)](https://www.npmjs.com/package/@open-wa/wa-automate) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/open-wa/wa-automate-nodejs.svg)](http://isitmaintained.com/project/open-wa/wa-automate-nodejs "Average time to resolve an issue")
+
+> [**orkestral/Venom**](https://github.com/orkestral/venom) (v2)
+> 
+> [![npm version](https://img.shields.io/npm/v/venom-bot.svg?color=green)](https://www.npmjs.com/package/venom-bot)
+[![Downloads](https://img.shields.io/npm/dm/venom-bot.svg)](https://www.npmjs.com/package/venom-bot)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/orkestral/venom.svg)](http://isitmaintained.com/project/orkestral/venom 'Average time to resolve an issue')
 
 ## Installation
 
