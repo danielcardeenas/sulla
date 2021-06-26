@@ -23,10 +23,23 @@
 > By default sulla will try to use Google Chrome driver if installed, if not, it
 > will use integrated Chromium instance
 
+
+## Sulla state
+
+As of version `2.3.5` it seems that sulla has reached a very rich and stable
+functionality and architecture. As much as I would love to, I cannot dedicate a
+lot of time to this project so please consider checking out forked versions of
+sulla where other developers can dedicate more time and support to it.
+
+Recommended actively supported sulla-based projects:
++ [**wppconnect**](https://github.com/wppconnect-team/wppconnect/) (v2)
++ [**open-wa/wa-automate**](https://github.com/open-wa/wa-automate-nodejs) (v1)
++ [**orkestral/Venom**](https://github.com/orkestral/venom) (v2)
+
 ## Installation
 
 ```bash
-> npm i sulla
+> npm i sulla --save
 ```
 
 ## Getting started
@@ -452,12 +465,6 @@ To build the entire project just run
 > npm run build
 ```
 
-## Sulla state
-
-As of version `2.3.5` it seems that sulla has reached a very rich and stable
-functionality and architecture. As much as I would love to, I cannot dedicate a
-lot of time to this project so please consider checking out forked versions of
-sulla where other developers can dedicate more time and support to it.
 
 ## Maintainers
 
