@@ -39,12 +39,6 @@ Recommended actively supported sulla-based projects:
 [![Downloads](https://img.shields.io/npm/dm/@open-wa/wa-automate.svg)](https://www.npmjs.com/package/@open-wa/wa-automate)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/open-wa/wa-automate-nodejs.svg)](http://isitmaintained.com/project/open-wa/wa-automate-nodejs "Average time to resolve an issue")
 
-> [**orkestral/Venom**](https://github.com/orkestral/venom)
-> 
-> [![last commit](https://img.shields.io/github/last-commit/orkestral/venom)](https://github.com/orkestral/venom)
-[![Downloads](https://img.shields.io/npm/dm/venom-bot.svg)](https://www.npmjs.com/package/venom-bot)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/orkestral/venom.svg)](http://isitmaintained.com/project/orkestral/venom 'Average time to resolve an issue')
-
 ## Installation
 
 ```bash
