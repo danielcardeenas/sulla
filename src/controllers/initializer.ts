@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import latestVersion from 'latest-version';
 import { Page } from 'puppeteer';
-import { timer } from 'rxjs';
+import { lastValueFrom, timer } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { Whatsapp } from '../api/whatsapp';
 import { CreateConfig, defaultOptions } from '../config/create-config';
@@ -46,7 +46,7 @@ export async function create(
   // If not authenticated, show QR and wait for scan
   if (authenticated) {
     // Wait til inside chat
-    await isInsideChat(waPage).toPromise();
+    await lastValueFrom(isInsideChat(waPage));
     spinnies.succeed(`${session}-auth`, { text: 'Authenticated' });
   } else {
     spinnies.update(`${session}-auth`, {
@@ -68,7 +68,7 @@ export async function create(
     }
 
     // Wait til inside chat
-    await isInsideChat(waPage).toPromise();
+    await lastValueFrom(isInsideChat(waPage));
     spinnies.succeed(`${session}-auth`, { text: 'Authenticated' });
   }
 

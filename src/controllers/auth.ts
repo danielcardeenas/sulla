@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { Page } from 'puppeteer';
 import * as qrcode from 'qrcode-terminal';
-import { BehaviorSubject, from, merge, of, race } from 'rxjs';
+import { lastValueFrom, BehaviorSubject, from, merge, of, race } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { htmlAuthQuery } from './constants/html-auth-query';
 
@@ -35,9 +35,8 @@ export const listenNetworkAuth = (waPage: Page) => {
  * @param waPage
  */
 export const isAuthenticated = (waPage: Page) => {
-  return merge(needsToScan(waPage), isInsideChat(waPage))
-    .pipe(take(1))
-    .toPromise();
+  return lastValueFrom(merge(needsToScan(waPage), isInsideChat(waPage))
+    .pipe(take(1)));
 };
 
 export const needsToScan = (waPage: Page) => {
