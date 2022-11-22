@@ -1,3 +1,4 @@
+
 <p align="center">
   <a href="https://github.com/danielcardeenas/sulla">
     <img width="250px" src="https://github.com/danielcardeenas/sulla/blob/master/img/logo.jpg?raw=true" alt="Sulla logo">
@@ -13,18 +14,16 @@
 [![codebeat badge](https://codebeat.co/badges/7e510d47-8689-49da-abd8-a9a29d106a2b)](https://codebeat.co/projects/github-com-danielcardeenas-sulla-master)
 
 > Sulla is a javascript library which provides a high-level API control to
-> Whatsapp so it can be configured to automatize resposes or any data that goes
-> trough Whatsapp effortlessly.
+> Whatsapp so it can be configured to automatize responses or any data that goes
+> through Whatsapp effortlessly.
 >
 > It is built using [puppeteer](https://github.com/GoogleChrome/puppeteer)
 
 
 ## Sulla state
 
-As of version `2.3.5` it seems that sulla has reached a very rich and stable
-functionality and architecture. As much as I would love to, I cannot dedicate a
-lot of time to this project so please consider checking out forked versions of
-sulla where other developers can dedicate more time and support to it.
+As of version `2.3.5` it seems that sulla has reached a very rich and stable functionality and architecture.
+As much as I would love to, I cannot dedicate a lot of time to this project so please consider checking out forked versions of sulla where other developers can dedicate more time and support to it.
 
 Recommended actively supported sulla-based projects:
 > [**wppconnect**](https://github.com/wppconnect-team/wppconnect/)
@@ -157,7 +156,7 @@ available can be found in [here](/src/api/layers) and
 
 ### Chatting
 
-##### Here, `chatId` could be `<phoneNuber>@c.us` or `<phoneNumber>-<groupId>@c.us`
+##### Here, `chatId` could be `<phoneNumber>@c.us` or `<phoneNumber>-<groupId>@c.us`
 
 ```javascript
 // Send basic text
