@@ -26,6 +26,12 @@ As of version `2.3.5` it seems that sulla has reached a very rich and stable fun
 As much as I would love to, I cannot dedicate a lot of time to this project so please consider checking out forked versions of sulla where other developers can dedicate more time and support to it.
 
 Recommended actively supported sulla-based projects:
+> [**venom**](https://github.com/orkestral/venom)
+> 
+> [![last commit](https://img.shields.io/github/last-commit/orkestral/venom)](https://github.com/orkestral/venom/)
+[![Downloads](https://img.shields.io/npm/dm/venom.svg)](https://www.npmjs.com/package/venom)
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/orkestral/venom.svg)](https://isitmaintained.com/project/orkestral/venom 'Average time to resolve an issue')
+
 > [**wppconnect**](https://github.com/wppconnect-team/wppconnect/)
 > 
 > [![last commit](https://img.shields.io/github/last-commit/wppconnect-team/wppconnect)](https://github.com/wppconnect-team/wppconnect/)
