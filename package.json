@@ -80,7 +80,7 @@
     "puppeteer-extra-plugin-stealth": "^2.7.5",
     "qrcode-terminal": "^0.12.0",
     "rxjs": "^6.6.3",
-    "sharp": "^0.27.1",
+    "sharp": "^0.30.5",
     "spinnies": "^0.5.1"
   }
 }
